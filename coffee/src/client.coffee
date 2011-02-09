@@ -1,3 +1,8 @@
+http = require 'http'
+sys = require 'sys'
+query = require 'querystring'
+
+
 ###
 	Wrapper for 3scale Web Service Management API.
 	The constructor requires at least two parameters
@@ -20,8 +25,31 @@ class Client
 	authorize: (options = {}) ->
 		unless options.app_id?
 			throw "missing app_id"
+		
+		@app_id = options.app_id
+		@app_key or= options.app_key
+		
+		url = "/transactions/authorize.xml?"
+		query = query.stringify {app_id: @app_id, app_key: @app_key, provider_key: @provider_key}
+		
+		threescale = http.createClient 80, @host
+		request = threescale.request "GET", "#{url}#{query}", {host: @host}
+		request.end()
+		request.on 'response', (response) ->
+			response.setEncoding 'utf8'
+			xml = ""
+			response.on 'data', (chunk) ->
+				xml += chunk
+			
+			response.on 'end', () ->
+				sys.puts xml
+			
+		
 	
 
 
 # Export the module
 module.exports = exports = Client
+
+client = new Client('05273bcb282d1d4faafffeb01e224db0')
+client.authorize({app_id: '75165984', app_key: '3e05c797ef193fee452b1ddf19defa74'})
