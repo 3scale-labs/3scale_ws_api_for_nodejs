@@ -1,6 +1,6 @@
 http = require 'http'
 sys = require 'sys'
-query = require 'querystring'
+querystring = require 'querystring'
 
 
 ###
@@ -26,11 +26,10 @@ class Client
 		unless options.app_id?
 			throw "missing app_id"
 		
-		@app_id = options.app_id
-		@app_key or= options.app_key
-		
 		url = "/transactions/authorize.xml?"
-		query = query.stringify {app_id: @app_id, app_key: @app_key, provider_key: @provider_key}
+		query = querystring.stringify options
+		query += '&' + querystring.stringify {provider_key: @provider_key}
+		sys.puts query
 		
 		threescale = http.createClient 80, @host
 		request = threescale.request "GET", "#{url}#{query}", {host: @host}
