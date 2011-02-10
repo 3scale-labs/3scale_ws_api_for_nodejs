@@ -29,10 +29,10 @@ class Client
 		@provider_key = provider_key
 		@host = default_host
   
-	authorize: (options = {}, callback) ->
+	authorize: (options, callback) ->
 		_self = this
 		result = null
-		unless options.app_id?
+		if (typeof options isnt 'object') && (options.app_id == null)
 			throw "missing app_id"
 
 		url = "/transactions/authorize.xml?"
@@ -43,16 +43,19 @@ class Client
 		request = threescale.request "GET", "#{url}#{query}", {host: @host}
 		request.end()
 		request.on 'response', (response) ->
+			sys.log "Status Code: #{response.statusCode}"
 			response.setEncoding 'utf8'
 			xml = ""
 			response.on 'data', (chunk) ->
 				xml += chunk
 			
 			response.on 'end', () ->
-				switch response.statusCode
-					when 200, 409 then callback _self._build_success_authorize_response xml
-					when 403 then callback _self._build_error_response xml
-					else throw "[Client::authorize] Server Error"
+				if response.statusCode == 200 || response.statusCode == 409
+					callback _self._build_success_authorize_response xml
+				else if response.statusCode in [400...409]
+					callback _self._build_error_response xml
+				else
+					throw "[Client::authorize] Server Error Code: #{response.statusCode}"
 			
 		
 	
@@ -81,7 +84,6 @@ class Client
 
 # privates methods
 	_build_success_authorize_response: (xml) ->
-		sys.log 'build success authorize response'
 		response = new AuthorizeResponse()
 		doc = parserxml.parseFromString xml
 		authorize = doc.documentElement.selectNodes('authorized')[0].nodeValue
@@ -93,7 +95,6 @@ class Client
 			response.error(reason)
 		
 		usage_reports = doc.documentElement.selectNodes('usage_reports/usage_report')
-		sys.puts 'Numero de informes: ' + usage_reports.length
 		for usage_report in usage_reports
 			do (usage_report) ->
 				report =
@@ -108,7 +109,6 @@ class Client
 		response
 	
 	_build_error_response: (xml) ->
-		sys.log 'build error response'
 		response = new AuthorizeResponse()
 		doc = parserxml.parseFromString xml
 		error = doc.documentElement
@@ -123,8 +123,8 @@ module.exports = exports = Client
 
 # client = new Client('05273bcb282d1d4faafffeb01e224db0')
 # client.authorize {app_id: '75165984', app_key: '3e05c797ef193fee452b1ddf19defa74'}, (response) ->
-# # 	sys.log sys.inspect response.error_code
-# 
+# 	sys.log sys.inspect response.error_code
+
 # 
 # trans = [
 # 	{ "app_id": "75165984", "usage": {"hits": 1}},

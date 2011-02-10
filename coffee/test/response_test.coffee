@@ -23,6 +23,11 @@ response_suite.addBatch(
 			assert.equal response.error_message, 'Error message'
 			assert.equal response.error_code, 123
 		
+		'have a custom code and null message after error': (response) ->
+			response.error('Error message')
+			assert.equal response.error_message, 'Error message'
+			assert.isNull response.error_code
+		
 		'have a is_success method': (response) ->
 			assert.isFunction response.is_success
 		

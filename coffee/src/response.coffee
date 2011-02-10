@@ -1,5 +1,5 @@
 class Response
-	constructor:( @error_code, @error_message) ->
+	constructor:() ->
 		@error_message = null
 		@error_code = null
 	
@@ -12,7 +12,7 @@ class Response
 		@error_message = message
 	
 	is_success: () ->
-		not (@error_code? && @error_message?)
+		((@error_code == null) && (@error_message == null))
 	
 
 module.exports = exports = Response

@@ -21,8 +21,7 @@ authorize_response_suite.addBatch({
     'can push a new UsageReport': function(authorize_response) {
       assert.length(authorize_response.usage_reports, 0);
       authorize_response.add_usage_reports(usage_report_options);
-      assert.length(authorize_response.usage_reports, 1);
-      return assert.insntanceOf(authorize_response.usage_reports[0], 'UsageReport');
+      return assert.length(authorize_response.usage_reports, 1);
     }
   }
 })["export"](module);
