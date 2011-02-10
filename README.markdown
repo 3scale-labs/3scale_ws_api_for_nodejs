@@ -34,8 +34,6 @@ In the root of the project
 
 #### Usage
 
-#### Usage
-
 ```js
 var Client = require('3scale').Client;
 client = new Client("your provider key");
