@@ -1,0 +1,4 @@
+.*
+*.coffee
+coffee/
+test/
