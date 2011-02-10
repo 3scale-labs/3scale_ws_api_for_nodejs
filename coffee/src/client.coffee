@@ -1,5 +1,4 @@
 http = require 'http'
-sys = require 'sys'
 querystring = require 'querystring'
 parserxml = require 'o3-fastxml'
 
@@ -7,19 +6,13 @@ Response = require './response'
 AuthorizeResponse = require './authorize_response'
 
 ###
-	Wrapper for 3scale Web Service Management API.
-	The constructor requires at least two parameters
-		app_id => Application id
-		provider_key => Provider key
-	
+	3Scale client API
+	Parameter:
+		provider_key {String} Required
+		default_host {String} Optional
 	Example:
-	
-		var Client = require("3scale").Client;
-		client = new Client('05273bcb282d1d4faafffeb01e224db0ZZZ')
-		client.authorize {app_id: '75165984', app_key: '3e05c797ef193fee452b1ddf19defa74'}, (response) ->
-			sys.log sys.inspect response
-		
-
+		Client = require('3scale').Client
+		client = new Client(provider_key, [default_host])
 ###
 class Client
 
@@ -29,6 +22,27 @@ class Client
 		@provider_key = provider_key
 		@host = default_host
   
+
+	###
+		Authorize a application
+
+		Parameters:
+			options is a Hash object with the following fields
+				app_id Required
+				app_key Required
+				referrer Optional 
+				usage Optional
+			callback {Fucntion} Is the callback function that receives the Response object which includes `is_success` 
+							method to determine the status of the response
+
+		Example:
+			client.authorize {app_id: '75165984', app_key: '3e05c797ef193fee452b1ddf19defa74'}, (response) ->
+				if response.is_success
+					# All Ok
+				else
+				 sys.puts "#{response.error_message} with code: #{response.error_code}"
+			
+	###
 	authorize: (options, callback) ->
 		_self = this
 		result = null
@@ -43,7 +57,6 @@ class Client
 		request = threescale.request "GET", "#{url}#{query}", {host: @host}
 		request.end()
 		request.on 'response', (response) ->
-			sys.log "Status Code: #{response.statusCode}"
 			response.setEncoding 'utf8'
 			xml = ""
 			response.on 'data', (chunk) ->
@@ -59,25 +72,60 @@ class Client
 			
 		
 	
-	report: (trans) ->
+
+	###
+		Report transaction(s).
+
+		Parameters:
+			trans {Array} each array element contain information of a transaction. That information is in a Hash in the form
+			{
+				app_id {String} Required
+				usage {Hash} Required
+				timestamp {String} any string parseable by the Data object
+			}
+			callback {Function} Function that recive the Response object which include a `is_success` method. Required
+
+		Example:
+			trans = [
+				{ "app_id": "abc123", "usage": {"hits": 1}},
+				{ "app_id": "abc123", "usage": {"hits": 1000}}
+			]
+
+			client.report trans, (response) ->
+				if response.is_success
+					# All Ok
+				else
+				 sys.puts "#{response.error_message} with code: #{response.error_code}"
+			
+
+	###
+	report: (trans, callback) ->
+		_self = this
 		unless trans?
 			throw "no transactions to report"
 
 		url = "/transactions.xml"
 		query = querystring.stringify {transactions: trans, provider_key: @provider_key}
-		sys.log query
-		
-		obj = querystring.parse query
-		sys.log sys.inspect obj
-		
+
 		threescale = http.createClient 80, @host
 		request = threescale.request "POST", "#{url}", 
 			{"host": @host, "Content-Type": "application/x-www-form-urlencoded", "Content-Length": query.length}
 		request.write query
 		request.end()
 		request.on 'response', (response) ->
-			sys.log sys.inspect response.client
-			sys.log response.statusCode
+			xml = ""
+			response.on "data", (data) ->
+				xml += data
+			
+			response.on 'end', () ->
+				if response.statusCode == 202
+					response = new Response()
+					response.success()
+					callback response
+				else if response.statusCode == 403
+					callback _self._build_error_response xml
+			
+				
 		
 
 	
@@ -120,18 +168,3 @@ class Client
 
 # Export the module
 module.exports = exports = Client
-
-# client = new Client('05273bcb282d1d4faafffeb01e224db0')
-# client.authorize {app_id: '75165984', app_key: '3e05c797ef193fee452b1ddf19defa74'}, (response) ->
-# 	sys.log sys.inspect response.error_code
-
-# 
-# trans = [
-# 	{ "app_id": "75165984", "usage": {"hits": 1}},
-# 	{ "app_id": "75165984", "usage": {"hits": 1000}}
-# ]
-# 
-# t = {transactions: trans, provider_key: "05273bcb282d1d4faafffeb01e224db0"}
-# 
-# sys.puts querystring.stringify t
-# client.report trans

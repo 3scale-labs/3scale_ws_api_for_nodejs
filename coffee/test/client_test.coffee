@@ -62,7 +62,6 @@ client_suite.addBatch(
 			
 		
 		'call the callback with the AuthorizeResponse': (response) ->
-			log inspect response
 			assert.isTrue response.is_success()
 			
 		
@@ -77,10 +76,16 @@ client_suite.addBatch(
 		'call the callback with a error response if app_id was wrong': (response) ->
 			assert.isFalse response.is_success()
 		
-		'In the transaction method should':
+	'In the transaction method should':
 			topic:->
 				promise = new events.EventEmitter
 				client = new Client provider_key
-				client.report report_test
+				client.report report_test, (response) ->
+					promise.emit 'success', response
+				
+				promise
+			
+			'give a success response with the correct params': (response) ->
+				assert.isTrue response.is_success()
 			
 ).export module

@@ -1,10 +1,27 @@
 /*
 	Temporal vars, to make the request, that have been remove form de final relase
 	TODO:	REMOVE the vars of the information about the service
-*/var Client, application_id, application_key, client_suite, events, inspect, log, provider_key;
+*/var Client, application_id, application_key, client_suite, events, inspect, log, provider_key, report_test, trans;
 provider_key = '05273bcb282d1d4faafffeb01e224db0';
 application_key = '3e05c797ef193fee452b1ddf19defa74';
 application_id = '75165984';
+trans = [
+  {
+    "app_id": application_id,
+    "usage": {
+      "hits": 1
+    }
+  }, {
+    "app_id": application_id,
+    "usage": {
+      "hits": 1000
+    }
+  }
+];
+report_test = {
+  transactions: trans,
+  provider_key: provider_key
+};
 require('./common');
 log = sys.log;
 inspect = sys.inspect;
@@ -58,7 +75,6 @@ client_suite.addBatch({
       return promise;
     },
     'call the callback with the AuthorizeResponse': function(response) {
-      log(inspect(response));
       return assert.isTrue(response.is_success());
     },
     topic: function() {
@@ -75,6 +91,20 @@ client_suite.addBatch({
     },
     'call the callback with a error response if app_id was wrong': function(response) {
       return assert.isFalse(response.is_success());
+    }
+  },
+  'In the transaction method should': {
+    topic: function() {
+      var client, promise;
+      promise = new events.EventEmitter;
+      client = new Client(provider_key);
+      client.report(report_test, function(response) {
+        return promise.emit('success', response);
+      });
+      return promise;
+    },
+    'give a success response with the correct params': function(response) {
+      return assert.isTrue(response.is_success());
     }
   }
 })["export"](module);
