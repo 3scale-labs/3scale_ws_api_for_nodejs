@@ -14,7 +14,7 @@ The module is delivered through the package manager npm, so that the installatio
 
 `npm install 3scale`
 
-Alternatively you can download the sources from the [project page](https://github.com/3scale/3scale_ws_api_for_js), and compile the script files * Coffee for the latest version of the module.
+Alternatively you can download the sources from the [project page](https://github.com/3scale/3scale_ws_api_for_nodejs), and compile the script files * Coffee for the latest version of the module.
 
 `rake compile`
 
@@ -33,11 +33,11 @@ To run tests:
 In the root of the project
 
 #### Usage
-
-```javascript
-
+`
 var Client = require('3scale').Client;
+
 client = new Client("your provider key");
+
 client.authorize({app_id: "your application id", app_key: "your application key"}, function(response){
   sys.log(sys.inspect(response));
 });
@@ -45,12 +45,11 @@ client.authorize({app_id: "your application id", app_key: "your application key"
 // Or for reports
 
 var trans = [
-		{ "app_id": "your application id", "usage": {"hits": 1}},
-		{ "app_id": "your application id", "usage": {"hits": 1000}}
+              { "app_id": "your application id", "usage": {"hits": 1}},
+              { "app_id": "your application id", "usage": {"hits": 1000}}
              ]
 
 client.report(trans, function(response){
   sys.log(sys.inspect(response));
 });
-
-```
+`
