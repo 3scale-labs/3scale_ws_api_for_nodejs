@@ -5,7 +5,7 @@
 
 * Parser xml with [node-o3-fastxml](https://github.com/ajaxorg/node-o3-fastxml)
 
-	This module is not available in the package manager npm. Therefore it is necessary to go to GitHub project page and get the *. node 
+	This module is not available in the package manager npm, so you will need to go to GitHub project page and get the *. node 
 	to be placed in the path of node.
 
 #### Installation
@@ -18,15 +18,15 @@ Alternatively you can download the sources from the [project page](https://githu
 
 `rake compile`
 
-Whether to make the compilation of sources must be installed in the system Coffee Script:
+To make the compilation of sources must be installed in the system Coffee Script:
 
 `npm install coffee-script`
 
-Once compiled these files must be placed in the path of node
+Once compiled these files must be placed in the node path
 
 #### Testing
 
-To run test:
+To run tests:
 
 `rake test`
 
