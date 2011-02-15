@@ -34,7 +34,8 @@ In the root of the project
 
 #### Usage
 
-`
+```javascript
+
 var Client = require('3scale').Client;
 client = new Client("your provider key");
 client.authorize({app_id: "your application id", app_key: "your application key"}, function(response){
@@ -51,4 +52,5 @@ var trans = [
 client.report(trans, function(response){
   sys.log(sys.inspect(response));
 });
-`
+
+```
