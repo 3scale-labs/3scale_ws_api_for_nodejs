@@ -33,23 +33,23 @@ To run tests:
 In the root of the project
 
 #### Usage
-`
-var Client = require('3scale').Client;
 
-client = new Client("your provider key");
+    var Client = require('3scale').Client;
 
-client.authorize({app_id: "your application id", app_key: "your application key"}, function(response){
-  sys.log(sys.inspect(response));
-});
+    client = new Client("your provider key");
 
-// Or for reports
+    client.authorize({app_id: "your application id", app_key: "your application key"}, function(response){
+      sys.log(sys.inspect(response));
+    });
 
-var trans = [
-              { "app_id": "your application id", "usage": {"hits": 1}},
-              { "app_id": "your application id", "usage": {"hits": 1000}}
-             ]
+    // Or for reports
 
-client.report(trans, function(response){
-  sys.log(sys.inspect(response));
-});
-`
+    var trans = [
+                  { "app_id": "your application id", "usage": {"hits": 1}},
+                  { "app_id": "your application id", "usage": {"hits": 1000}}
+                 ]
+
+    client.report(trans, function(response){
+      sys.log(sys.inspect(response));
+    });
+
