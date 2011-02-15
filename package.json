@@ -6,6 +6,7 @@
   "repository": {},
   "author": "Carlos Villuendas <carlosvillu@3scale.net>",
   "main": "./lib/3scale/index",
+  "repository": {"type": "git", "url": "http://github.com/3scale/3scale_ws_api_for_nodejs.git"},
   "directories": {
     "lib": "lib/3scale"
   },
