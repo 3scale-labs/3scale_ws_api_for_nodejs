@@ -1,36 +1,22 @@
-# Client for 3Scale web service
-***
+# 3scale integration plugin for JavaScript/CoffeeScript/Node.js applications
+
+3scale is an API Infrastructure service which handles API Keys, Rate Limiting, Analytics, Billing Payments and Developer Management.
+Includes a configurable API dashboard and developer portal CMS.
+More product stuff at http://www.3scale.net/, support information at http://support.3scale.net/.
 
 #### Requirements
 
-* Parser xml with [node-o3-fastxml](https://github.com/ajaxorg/node-o3-fastxml)
-
-	This module is not available in the package manager npm, so you will need to go to GitHub project page and get the *. node 
-	to be placed in the path of node.
+* libxml2 library
 
 #### Installation
 
-The module is delivered through the package manager npm, so that the installation should be:
-
-`npm install 3scale`
-
-Alternatively you can download the sources from the [project page](https://github.com/3scale/3scale_ws_api_for_nodejs), and compile the script files * Coffee for the latest version of the module.
-
-`rake compile`
-
-To make the compilation of sources must be installed in the system Coffee Script:
-
-`npm install coffee-script`
-
-Once compiled these files must be placed in the node path
+The module is delivered through the package manager npm, so that the installation should be easy as: `npm install 3scale`
 
 #### Testing
 
-To run tests:
+To run tests: `vows test/* --spec`
 
-`rake test`
-
-In the root of the project
+In the root of the project.
 
 #### Usage
 
