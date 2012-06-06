@@ -1,4 +1,4 @@
-# 3scale integration plugin for JavaScript/CoffeeScript/Node.js applications
+# 3scale integration plugin for JavaScript/CoffeeScript/Node.js applications [![Build Status](https://secure.travis-ci.org/3scale/3scale_ws_api_for_nodejs.png?branch=master)](http://travis-ci.org/3scale/3scale_ws_api_for_nodejs)
 
 3scale is an API Infrastructure service which handles API Keys, Rate Limiting, Analytics, Billing Payments and Developer Management.
 Includes a configurable API dashboard and developer portal CMS.
