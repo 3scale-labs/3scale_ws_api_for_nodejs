@@ -3,7 +3,7 @@
   "description": "Client for 3Scale Networks API",
   "version": "0.2.0",
   "homepage": "http://www.3scale.net",
-  "repository": {},
+  "repository": {"type": "git", "url": "http://github.com/3scale/3scale_ws_api_for_nodejs.git"},
   "author": "Carlos Villuendas <carlosvillu@3scale.net>",
   "contributors": [
     { "name": "Carlos Villuendas", "email": "carlosvillu@3scale.net" },
@@ -14,7 +14,6 @@
     "url": "http://github.com/3scale/3scale_ws_api_for_nodejs/issues"
   },
   "keywords": ["api", "authorization", "3scale", "web"],
-  "repository": {"type": "git", "url": "http://github.com/3scale/3scale_ws_api_for_nodejs.git"},
   "scripts": {
     "prepublish": "coffee --bare -o lib -c src",
     "test": "vows"
@@ -23,7 +22,7 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "o3-xml": "0.1.x"
+    "libxmljs-easy": "*"
   },
   "devDependencies": {
     "coffee-script": "1.x",
