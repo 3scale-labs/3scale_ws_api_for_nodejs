@@ -9,14 +9,14 @@
     { "name": "Carlos Villuendas", "email": "carlosvillu@3scale.net" },
     { "name": "Michal Cichra", "email": "michal@3scale.net" }
   ],
-  "main": "index",
+  "main": ".lib/index",
   "bugs": {
     "url": "http://github.com/3scale/3scale_ws_api_for_nodejs/issues"
   },
   "keywords": ["api", "authorization", "3scale", "web"],
   "scripts": {
     "prepublish": "coffee --bare -o lib -c src",
-    "test": "vows"
+    "test": "vows test/* --spec"
   },
   "directories": {
     "lib": "./lib"
