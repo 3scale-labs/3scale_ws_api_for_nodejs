@@ -1,2 +1,2 @@
 .DS_Store
-lib/3scale/*.js
+/node_modules

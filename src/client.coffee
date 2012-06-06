@@ -1,6 +1,6 @@
 http = require 'http'
 querystring = require 'querystring'
-parserxml = require 'o3-fastxml'
+parserxml = require 'o3-xml'
 
 Response = require './response'
 AuthorizeResponse = require './authorize_response'
@@ -14,7 +14,8 @@ AuthorizeResponse = require './authorize_response'
 		Client = require('3scale').Client
 		client = new Client(provider_key, [default_host])
 ###
-class Client
+#
+module.exports = class Client
 
 	constructor: (provider_key, default_host = "su1.3scale.net") ->
 		unless provider_key?
@@ -164,7 +165,3 @@ class Client
 		response = new Response()
 		response.error error.nodeValue, error.getAttribute 'code'
 		response
-	
-
-# Export the module
-module.exports = exports = Client
