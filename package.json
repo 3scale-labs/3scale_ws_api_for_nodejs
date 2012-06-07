@@ -37,7 +37,7 @@
     "vows": "0.5.x"
   },
   "engines": {
-    "node": "*"
+    "node": "0.6.x"
   },
   "optionalDependencies": {}
 }
