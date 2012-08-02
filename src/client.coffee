@@ -137,7 +137,7 @@ module.exports = class Client
     if authorize is 'true'
       response.success()
     else
-      reason = doc.get '//reason'
+      reason = doc.get('//reason').text()
       response.error(reason)
 
     usage_reports = doc.get '//usage_reports'
