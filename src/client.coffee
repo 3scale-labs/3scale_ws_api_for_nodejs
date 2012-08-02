@@ -1,6 +1,6 @@
 http = require 'http'
 querystring = require 'querystring'
-easy = require('libxmljs-easy')
+libxml = require 'libxmljs'
 
 Response = require './response'
 AuthorizeResponse = require './authorize_response'
@@ -130,36 +130,36 @@ module.exports = class Client
   # privates methods
   _build_success_authorize_response: (xml) ->
     response = new AuthorizeResponse()
-    doc = easy.parse(xml)
-    authorize = doc.authorized[0].$.text()
-    plan = doc.plan[0].$.text()
-
+    doc = libxml.parseXml xml
+    authorize = doc.get('//authorized').text()
+    plan = doc.get('//plan').text()
+    
     if authorize is 'true'
       response.success()
     else
-      reason = doc.reason[0]
+      reason = doc.get '//reason'
       response.error(reason)
 
-    usage_reports = doc.usage_reports[0].usage_report
+    usage_reports = doc.get '//usage_reports'
 
-    for index, usage_report of usage_reports
+    for index, usage_report of usage_reports.childNodes()
       do (usage_report) ->
         report =
-          period: usage_report.$period
-          metric: usage_report.$metric
-          period_start: usage_report.period_start[0].$.text()
-          period_end: usage_report.period_end[0].$.text()
-          current_value: usage_report.current_value[0].$.text()
-          max_value: usage_report.max_value[0].$.text()
+          period: usage_report.attr('period').value()
+          metric: usage_report.attr('metric').value()
+          period_start: usage_report.get('period_start').text()
+          period_end: usage_report.get('period_end').text()
+          current_value: usage_report.get('current_value').text()
+          max_value: usage_report.get('max_value').text()
         response.add_usage_reports report
-
+    
     response
 
   _build_error_response: (xml) ->
     response = new AuthorizeResponse()
-    doc = easy.parse xml
-    error = doc[0]
+    doc = libxml.parseXml xml
+    error = doc.get '/error'
 
     response = new Response()
-    response.error error.$.text(), error.$code
+    response.error error.text(), error.attr('code').value()
     response
