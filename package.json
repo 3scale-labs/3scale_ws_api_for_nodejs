@@ -1,7 +1,7 @@
 {
   "name": "3scale",
   "description": "Client for 3Scale Networks API",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "homepage": "http://www.3scale.net",
   "repository": {
     "type": "git",
@@ -31,7 +31,8 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "libxmljs": "*"
+    "libxmljs": "*",
+    "qs": "*"
   },
   "devDependencies": {
     "coffee-script": "1.x",
