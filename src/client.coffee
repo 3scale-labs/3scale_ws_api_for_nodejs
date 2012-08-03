@@ -148,16 +148,17 @@ module.exports = class Client
 
     usage_reports = doc.get '//usage_reports'
 
-    for index, usage_report of usage_reports.childNodes()
-      do (usage_report) ->
-        report =
-          period: usage_report.attr('period').value()
-          metric: usage_report.attr('metric').value()
-          period_start: usage_report.get('period_start').text()
-          period_end: usage_report.get('period_end').text()
-          current_value: usage_report.get('current_value').text()
-          max_value: usage_report.get('max_value').text()
-        response.add_usage_reports report
+    if usage_reports
+      for index, usage_report of usage_reports.childNodes()
+        do (usage_report) ->
+          report =
+            period: usage_report.attr('period').value()
+            metric: usage_report.attr('metric').value()
+            period_start: usage_report.get('period_start').text()
+            period_end: usage_report.get('period_end').text()
+            current_value: usage_report.get('current_value').text()
+            max_value: usage_report.get('max_value').text()
+          response.add_usage_reports report
     
     response
 
