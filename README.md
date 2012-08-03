@@ -4,8 +4,6 @@
 Includes a configurable API dashboard and developer portal CMS.
 More product stuff at http://www.3scale.net/, support information at http://support.3scale.net/.
 
-## WARNING: This plugin is work-in-progress and is currently unsupported!
-
 #### Requirements
 
 * libxml2 library
