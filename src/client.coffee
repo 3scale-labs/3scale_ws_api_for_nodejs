@@ -1,5 +1,5 @@
 https = require 'https'
-querystring = require 'querystring'
+querystring = require 'qs'
 libxml = require 'libxmljs'
 
 Response = require './response'
@@ -109,7 +109,7 @@ module.exports = class Client
       throw "no transactions to report"
 
     url = "/transactions.xml"
-    query = querystring.stringify {transactions: trans, provider_key: @provider_key}
+    query = querystring.stringify({transactions: trans, provider_key: @provider_key}).replace(/\[/g, "%5B").replace(/\]/g, "%5D")
 
     req_opts = 
       host:    @host
