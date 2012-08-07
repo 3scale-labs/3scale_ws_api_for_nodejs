@@ -11,7 +11,8 @@
   "contributors": [
     "Carlos Villuendas <carlosvillu@3scale.net>",
     "Michal Cichra <michal@3scale.net>",
-    "Daniel Stevens <daniel.stevens@senicolabs.com>"
+    "Daniel Stevens <daniel.stevens@senicolabs.com>",
+    "Joaquin Rivera (joahking) <joaquin@3scale.net>"
   ],
   "main": "lib/index.js",
   "bugs": {
