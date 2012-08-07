@@ -1,5 +1,5 @@
 language: node_js
 node_js:
+  - 0.4
   - 0.6
-  # - 0.4 # libxmljs-easy does not have compile target for this version
-  # - 0.7 # (0.8) libxmljs-easy does not have compile target for this version
+  - 0.8
