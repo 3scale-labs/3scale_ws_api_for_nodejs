@@ -36,6 +36,6 @@ In the root of the project.
                  ]
 
     client.report(trans, function(response){
-      sys.log(sys.inspect(response));
+      console.log(response);
     });
 
