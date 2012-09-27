@@ -18,7 +18,6 @@ AuthorizeResponse = require './authorize_response'
 module.exports = class Client
 
   constructor: (provider_key, default_host = "su1.3scale.net") ->
-    # console.log 'USING LOCAL SRC'
     unless provider_key?
       throw new Error("missing provider_key")
     @provider_key = provider_key
@@ -77,7 +76,7 @@ module.exports = class Client
     request.end()
 
   ###
-    OAuthorize an Application -> oAuth
+    OAuthorize an Application
     Parameters:
       options is a Hash object with the following fields
         app_id Required
@@ -100,10 +99,7 @@ module.exports = class Client
 
     url = "/transactions/oauth_authorize.xml?"
     query = querystring.stringify options
-    query += '&' + querystring.stringify {provider_key: @provider_key, app_id: options.app_id}
-
-    if(options.service_id isnt undefined)
-      query += querystring.stringify {service_id: options.service_id}
+    query += '&' + querystring.stringify {provider_key: @provider_key}
 
     req_opts = 
       host:   @host
@@ -126,8 +122,20 @@ module.exports = class Client
     request.end()
 
   ###
-    
-    
+    Authorize with user_key
+    Parameters:
+      options is a Hash object with the following fields
+        user_key Required
+        service_id Optional (In case of mmultiple services)
+      callback {Function} Is the callback function that receives the Response object which includes `is_success`
+              method to determine the status of the response
+
+    Example:
+      client.authorize_with_user_key {user_key: '123456', (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
 
   ###
   authorize_with_user_key: (options, callback) ->
@@ -139,8 +147,6 @@ module.exports = class Client
     url = "/transactions/authorize.xml?"
     query = querystring.stringify options
     query += '&' + querystring.stringify {provider_key: @provider_key}
-    if options.user_key isnt undefined
-      query += querystring.stringify(user_key: options.user_key)
 
     req_opts = 
       host:   @host
@@ -163,8 +169,19 @@ module.exports = class Client
     request.end()
 
   ###
-    Authorize Report with :app_id
+    Authorize and Report in single call
+      options is a Hash object with the following fields
+        app_id Required
+        app_key, user_id, object, usage, no-body, service_id Optional 
+      callback {Function} Is the callback function that receives the Response object which includes `is_success`
+              method to determine the status of the response
 
+    Example:
+      client.authrep {app_id: '75165984', (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
 
   ###
   authrep: (options, callback) ->
@@ -174,20 +191,7 @@ module.exports = class Client
 
     url = "/transactions/authrep.xml?"
     query = querystring.stringify options
-    query += '&' + querystring.stringify {app_id: options.app_id}
-    
-    if options.user_key isnt undefined
-      query += querystring.stringify(user_key: options.user_key)
-    if options.app_key isnt undefined
-      query += querystring.stringify(app_key: options.app_key)
-    if options.user_id isnt undefined
-      query += querystring.stringify(user_id: options.user_id)
-    if options.object isnt undefined
-      query += querystring.stringify(object: options.object)
-    if options.no_body isnt undefined
-      query += querystring.stringify(no_body: options.no_body)
-    if options.service_id isnt undefined
-      query += querystring.stringify(service_id: options.service_id)
+    query += '&' + querystring.stringify {provider_key: @provider_key}
 
     req_opts = 
       host:   @host
@@ -210,7 +214,7 @@ module.exports = class Client
     request.end()
 
   ###
-    Authorize Report with :user_key
+    Authorize and Report with :user_key
 
   ###
   authrep_with_user_key: (options, callback) ->
@@ -220,18 +224,7 @@ module.exports = class Client
 
     url = "/transactions/authrep.xml?"
     query = querystring.stringify options
-    query += '&' + querystring.stringify {user_key: options.user_key}
-      
-    if options.user_id isnt undefined
-      query += querystring.stringify(user_id: options.user_id)
-    if options.usage isnt undefined
-      query += querystring.stringify(usage: options.usage)
-    if options.object isnt undefined
-      query += querystring.stringify(object: options.object)
-    if options.no_body isnt undefined
-      query += querystring.stringify(no_body: options.no_body)
-    if options.service_id isnt undefined
-      query += querystring.stringify(service_id: options.service_id)
+    query += '&' + querystring.stringify {provider_key: @provider_key}
 
     req_opts = 
       host:   @host
