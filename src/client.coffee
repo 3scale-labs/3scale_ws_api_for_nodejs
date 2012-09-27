@@ -18,8 +18,9 @@ AuthorizeResponse = require './authorize_response'
 module.exports = class Client
 
   constructor: (provider_key, default_host = "su1.3scale.net") ->
+    # console.log 'USING LOCAL SRC'
     unless provider_key?
-      throw "missing provider_key"
+      throw new Error("missing provider_key")
     @provider_key = provider_key
     @host = default_host
 
@@ -47,7 +48,8 @@ module.exports = class Client
   authorize: (options, callback) ->
     _self = this
     result = null
-    if (typeof options isnt 'object') && (options.app_id == null)
+
+    if (typeof options isnt 'object') || (options.app_id is undefined)
       throw "missing app_id"
 
     url = "/transactions/authorize.xml?"
@@ -74,8 +76,182 @@ module.exports = class Client
           throw "[Client::authorize] Server Error Code: #{response.statusCode}"
     request.end()
 
+  ###
+    OAuthorize an Application -> oAuth
+    Parameters:
+      options is a Hash object with the following fields
+        app_id Required
+        service_id Optional (In case of mmultiple services)
+      callback {Function} Is the callback function that receives the Response object which includes `is_success`
+              method to determine the status of the response
+
+    Example:
+      client.oauth_authorize {app_id: '75165984', (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
+
+  ###
+  oauth_authorize: (options, callback) ->
+    _self = this
+    if (typeof options isnt 'object')|| (options.app_id is undefined)
+      throw "missing app_id"
+
+    url = "/transactions/oauth_authorize.xml?"
+    query = querystring.stringify options
+    query += '&' + querystring.stringify {provider_key: @provider_key, app_id: options.app_id}
+
+    if(options.service_id isnt undefined)
+      query += querystring.stringify {service_id: options.service_id}
+
+    req_opts = 
+      host:   @host
+      port:   443
+      path:   url + query
+      method: 'GET'
+    request = https.request req_opts, (response) ->
+      response.setEncoding 'utf8'
+      xml = ""
+      response.on 'data', (chunk) ->
+        xml += chunk
+
+      response.on 'end', ->
+        if response.statusCode == 200 || response.statusCode == 409
+          callback _self._build_success_authorize_response xml
+        else if response.statusCode in [400...409]
+          callback _self._build_error_response xml
+        else
+          throw "[Client::oauth_authorize] Server Error Code: #{response.statusCode}"
+    request.end()
+
+  ###
+    
+    
+
+  ###
+  authorize_with_user_key: (options, callback) ->
+    _self = this
+
+    if (typeof options isnt 'object') || (options.user_key is undefined)
+      throw "missing user_key"
+
+    url = "/transactions/authorize.xml?"
+    query = querystring.stringify options
+    query += '&' + querystring.stringify {provider_key: @provider_key}
+    if options.user_key isnt undefined
+      query += querystring.stringify(user_key: options.user_key)
+
+    req_opts = 
+      host:   @host
+      port:   443
+      path:   url + query
+      method: 'GET'
+    request = https.request req_opts, (response) ->
+      response.setEncoding 'utf8'
+      xml = ""
+      response.on 'data', (chunk) ->
+        xml += chunk
+
+      response.on 'end', ->
+        if response.statusCode == 200 || response.statusCode == 409
+          callback _self._build_success_authorize_response xml
+        else if response.statusCode in [400...409]
+          callback _self._build_error_response xml
+        else
+          throw "[Client::authorize_with_user_key] Server Error Code: #{response.statusCode}"
+    request.end()
+
+  ###
+    Authorize Report with :app_id
 
 
+  ###
+  authrep: (options, callback) ->
+    _self = this
+    if (typeof options isnt 'object') || (options.app_id is undefined)
+      throw "missing app_id"
+
+    url = "/transactions/authrep.xml?"
+    query = querystring.stringify options
+    query += '&' + querystring.stringify {app_id: options.app_id}
+    
+    if options.user_key isnt undefined
+      query += querystring.stringify(user_key: options.user_key)
+    if options.app_key isnt undefined
+      query += querystring.stringify(app_key: options.app_key)
+    if options.user_id isnt undefined
+      query += querystring.stringify(user_id: options.user_id)
+    if options.object isnt undefined
+      query += querystring.stringify(object: options.object)
+    if options.no_body isnt undefined
+      query += querystring.stringify(no_body: options.no_body)
+    if options.service_id isnt undefined
+      query += querystring.stringify(service_id: options.service_id)
+
+    req_opts = 
+      host:   @host
+      port:   443
+      path:   url + query
+      method: 'GET'
+    request = https.request req_opts, (response) ->
+      response.setEncoding 'utf8'
+      xml = ""
+      response.on 'data', (chunk) ->
+        xml += chunk
+
+      response.on 'end', ->
+        if response.statusCode == 200 || response.statusCode == 409
+          callback _self._build_success_authorize_response xml
+        else if response.statusCode in [400...409]
+          callback _self._build_error_response xml
+        else
+          throw "[Client::authrep] Server Error Code: #{response.statusCode}"
+    request.end()
+
+  ###
+    Authorize Report with :user_key
+
+  ###
+  authrep_with_user_key: (options, callback) ->
+    _self = this
+    if (typeof options isnt 'object') || (options.user_key is undefined)
+      throw "missing user_key"
+
+    url = "/transactions/authrep.xml?"
+    query = querystring.stringify options
+    query += '&' + querystring.stringify {user_key: options.user_key}
+      
+    if options.user_id isnt undefined
+      query += querystring.stringify(user_id: options.user_id)
+    if options.usage isnt undefined
+      query += querystring.stringify(usage: options.usage)
+    if options.object isnt undefined
+      query += querystring.stringify(object: options.object)
+    if options.no_body isnt undefined
+      query += querystring.stringify(no_body: options.no_body)
+    if options.service_id isnt undefined
+      query += querystring.stringify(service_id: options.service_id)
+
+    req_opts = 
+      host:   @host
+      port:   443
+      path:   url + query
+      method: 'GET'
+    request = https.request req_opts, (response) ->
+      response.setEncoding 'utf8'
+      xml = ""
+      response.on 'data', (chunk) ->
+        xml += chunk
+
+      response.on 'end', ->
+        if response.statusCode == 200 || response.statusCode == 409
+          callback _self._build_success_authorize_response xml
+        else if response.statusCode in [400...409]
+          callback _self._build_error_response xml
+        else
+          throw "[Client::authrep_with_user_key] Server Error Code: #{response.statusCode}"
+    request.end()  
 
   ###
     Report transaction(s).
