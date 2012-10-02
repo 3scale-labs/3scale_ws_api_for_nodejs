@@ -105,7 +105,7 @@ vows
         client = new Client(provider_key)
         assert.isFunction client.authrep_with_user_key
 
-      'ahould throw an exception if authrep_with_user_key is called without :user_key': (Client) ->
+      'should throw an exception if authrep_with_user_key is called without :user_key': (Client) ->
         client = new Client(provider_key)
         assert.throws (() -> client.authrep_with_user_key({}, ()->)), 'missing user_key'  
 
