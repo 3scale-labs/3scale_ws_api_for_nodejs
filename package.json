@@ -12,7 +12,7 @@
     "Carlos Villuendas <carlosvillu@3scale.net>",
     "Michal Cichra <michal@3scale.net>",
     "Daniel Stevens <daniel.stevens@senicolabs.com>",
-    "Chaitanya Surapaneni <chaitanya.surapaneni@senicolabs.com>"
+    "Chaitanya Surapaneni <chaitanya.surapaneni@senicolabs.com>",
     "Joaquin Rivera (joahking) <joaquin@3scale.net>"
   ],
   "main": "lib/index.js",
