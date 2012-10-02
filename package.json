@@ -1,7 +1,7 @@
 {
   "name": "3scale",
   "description": "Client for 3Scale Networks API",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "homepage": "http://www.3scale.net",
   "repository": {
     "type": "git",
@@ -12,6 +12,7 @@
     "Carlos Villuendas <carlosvillu@3scale.net>",
     "Michal Cichra <michal@3scale.net>",
     "Daniel Stevens <daniel.stevens@senicolabs.com>",
+    "Chaitanya Surapaneni <chaitanya.surapaneni@senicolabs.com>"
     "Joaquin Rivera (joahking) <joaquin@3scale.net>"
   ],
   "main": "lib/index.js",
