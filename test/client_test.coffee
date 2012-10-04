@@ -11,7 +11,6 @@
 provider_key = '05273bcb282d1d4faafffeb01e224db0'
 application_key = '3e05c797ef193fee452b1ddf19defa74'
 application_id = '75165984'  
-###
 
 trans = [
   { "app_id": application_id, "usage": {"hits": 1}},
