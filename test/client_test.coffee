@@ -4,29 +4,13 @@
 ###
 
 ###
+  TODO: remove these keys and parameterize the tests!
   Default 3scale Keys
   Supports basic authentication
 ###
 provider_key = '05273bcb282d1d4faafffeb01e224db0'
 application_key = '3e05c797ef193fee452b1ddf19defa74'
 application_id = '75165984'  
-
-###
-  Senico Keys
-  Use these keys for User_Key Login
-###
-senico_provider_key = '9ac46ea91a02dc8c35bb84d62837addd'
-senico_application_key = '8dc7bdce6573eb9cc4b57a8924b02d99'
-senico_application_id = '9f45d21e'
-senico_user_key = '3d63ef791d0c439878f0a85b45f3a4aa'
-###
-  Use these for oAuth
-###
-oauth_provider_key = '9bf4a46c63f6bad158e5056ac9a37036'
-oauth_application_key = '721ca43c021a4fb3995b4d9bbd3243ae'
-oauth_application_id = '23a06147'
-###
-  End Senico Keys
 ###
 
 trans = [
