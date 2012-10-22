@@ -10,8 +10,7 @@
 ###
 provider_key = '05273bcb282d1d4faafffeb01e224db0'
 application_key = '3e05c797ef193fee452b1ddf19defa74'
-application_id = '75165984'  
-###
+application_id = '75165984'
 
 trans = [
   { "app_id": application_id, "usage": {"hits": 1}},
@@ -32,7 +31,8 @@ vows
     'A client ':
       topic: -> Client
       'should throw an exception if init without provider_key': (Client) ->
-        assert.throws(`function(){ new Client()}`, "missing provider_key")
+        call = -> new Client()
+        assert.throws call, "missing provider_key"
         return
 
       'should have an default host': (Client) ->
@@ -91,7 +91,7 @@ vows
 
       'should throw an exception if authrep_with_user_key is called without :user_key': (Client) ->
         client = new Client(provider_key)
-        assert.throws (() -> client.authrep_with_user_key({}, ()->)), 'missing user_key'  
+        assert.throws (() -> client.authrep_with_user_key({}, ()->)), 'missing user_key'
 
     'The authorize method should':
       topic: ->
@@ -108,7 +108,8 @@ vows
       'call the callback with the AuthorizeResponse': (response) ->
         assert.isTrue response.is_success()
 
-    'The oauth_authorize method should':
+    'The oauth_authorize method should': 'TODO'
+    ###
       topic: ->
         promise = new events.EventEmitter
         client = new Client oauth_provider_key
@@ -122,23 +123,9 @@ vows
 
       'call the callback with the AuthorizeResponse': (response) ->
         assert.isTrue response.is_success()
+    ###
 
-    'The authorize_with_user_key method should':
-      topic: ->
-        promise = new events.EventEmitter
-        client = new Client senico_provider_key
-        client.authorize_with_user_key {user_key: senico_user_key}, (response) ->
-          if response.is_success
-            promise.emit 'success', response
-          else
-            promise.else 'error', response
-
-        promise
-
-      'call the callback with the AuthorizeResponse': (response) ->
-        assert.isTrue response.is_success()
-
-    'The Event Emitter':  
+    'The Event Emitter':
       topic: ->
         promise = new events.EventEmitter
         client = new Client provider_key
@@ -160,5 +147,5 @@ vows
           promise
 
         'give a success response with the correct params': (response) ->
-          assert.isTrue response.is_success()     
+          assert.isTrue response.is_success()
   .export module
