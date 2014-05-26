@@ -1,16 +1,7 @@
-###
-  Temporal vars, to make the request, that have been remove form de final relase
-  TODO: REMOVE the vars of the information about the service
-###
-
-###
-  TODO: remove these keys and parameterize the tests!
-  Default 3scale Keys
-  Supports basic authentication
-###
-provider_key = '05273bcb282d1d4faafffeb01e224db0'
-application_key = '3e05c797ef193fee452b1ddf19defa74'
-application_id = '75165984'
+# Set environment variables for tests that run against the 3scale API or use dummy keys
+provider_key = process.env.TEST_3SCALE_PROVIDER_KEY or '05273bcb282d1d4faafffeb01e224db0'
+application_key = process.env.TEST_3SCALE_APP_KEY or '3e05c797ef193fee452b1ddf19defa74'
+application_id = process.env.TEST_3SCALE_APP_ID or '75165984'
 
 trans = [
   { "app_id": application_id, "usage": {"hits": 1}},
