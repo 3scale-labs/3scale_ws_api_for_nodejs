@@ -250,6 +250,7 @@ module.exports = class Client
     Report transaction(s).
 
     Parameters:
+      service_id {String} Optional (required only if you have more than one service)
       trans {Array} each array element contain information of a transaction. That information is in a Hash in the form
       {
         app_id {String} Required
@@ -272,13 +273,21 @@ module.exports = class Client
 
 
   ###
-  report: (trans, callback) ->
+  report: (service_id, trans, callback) ->
     _self = this
+
+    if (typeof service_id is 'object') and (typeof trans is 'function')
+      callback = trans
+      trans = service_id
+      service_id = undefined
+
     unless trans?
-      throw "no transactions to report"
+      throw new Error("no transactions to report")
 
     url = "/transactions.xml"
-    query = querystring.stringify({transactions: trans, provider_key: @provider_key}).replace(/\[/g, "%5B").replace(/\]/g, "%5D")
+    params = {transactions: trans, provider_key: @provider_key}
+    params.service_id = service_id if service_id
+    query = querystring.stringify(params).replace(/\[/g, "%5B").replace(/\]/g, "%5D")
 
     req_opts = 
       host:    @host
