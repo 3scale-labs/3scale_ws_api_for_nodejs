@@ -317,6 +317,10 @@ module.exports = class Client
     doc = libxml.parseXml xml
     authorize = doc.get('//authorized').text()
     plan = doc.get('//plan').text()
+    key = doc.get('//application//key').text()
+    
+    if key then response.set_key(key)
+    if plan then response.set_plan(plan)
     
     if authorize is 'true'
       response.success()
