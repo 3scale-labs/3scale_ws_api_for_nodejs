@@ -1,10 +1,10 @@
 language: node_js
 node_js:
-  - 0.6
-  - 0.8
-  - 0.10
+- 0.6
+- 0.8
+- 0.1
 env:
   global:
-    - TEST_3SCALE_APP_ID=4d4b20b9
-    - TEST_3SCALE_APP_KEY=ecce202ecc2eb8dc7a499c34a34d5987
-    - secure: a3qOr0nVQrJrzZqVnPt9AH3X0EBQxr2Fm3CPrX24t+fFpq0ZvKyLgObTmt+WhwrVkxQD8xDnKUFrsLfq1FclzU+wn3s7h117cJtcXS3iM9edVHFSS8SxmTs0N/B0sc5BcOcBaTTf6r0T/E95+ZsmzRwUc8CJygFpOUN9RuNsjso=
+  - TEST_3SCALE_APP_ID=4d4b20b9
+  - TEST_3SCALE_APP_KEY=ecce202ecc2eb8dc7a499c34a34d5987
+  - secure: B/3oWYZZttrXVM5IFn2evSuWMOQqEOOMol3nEQ2vEDGQ6rdGjpYLFDO/qMDPA8Af6Vt72lOFKkgzivuBp8nSd4S1YRTazilMle4zCJiJxzPs69kRDVXf/Mn8Qr/YrmgVzhblvdNqbKxTGrYyvDziPkliQKtIhqyILm3d6+CqmYw=
