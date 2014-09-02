@@ -12,6 +12,7 @@ report_test = {transactions: trans, provider_key: provider_key}
 events = require('events')
 vows = require('vows')
 assert = require('assert')
+nock = require('nock')
 
 # Object to testing
 Client = require('../src/client')
@@ -139,4 +140,55 @@ vows
 
         'give a success response with the correct params': (response) ->
           assert.isTrue response.is_success()
+
+    'Request headers ':
+      topic: ->
+        nock.recorder.rec({
+          output_objects: true,
+          dont_print: true,
+          enable_reqheaders_recording: true
+        })
+        return null
+
+      'in authorize calls':
+        topic: ->
+          promise = new events.EventEmitter
+          client = new Client provider_key
+          client.authorize {app_key: application_key, app_id: application_id}, (response) ->
+            if response.is_success
+              promise.emit 'success', response
+            else
+              promise.else 'error', response
+          promise
+
+        'should include the 3scale user agent': (response) ->
+          nock_call_objects = nock.recorder.play()
+          last_request_headers = nock_call_objects[0].reqheaders
+          version = require('../package.json').version
+          assert.equal last_request_headers['x-3scale-user-agent'], "plugin-node-v#{version}"
+
+        'should include the default 3scale host': (response) ->
+          nock_call_objects = nock.recorder.play()
+          last_request_headers = nock_call_objects[0].reqheaders
+          assert.equal last_request_headers['host'], 'su1.3scale.net'
+
+      'in report calls':
+        topic: ->
+          promise = new events.EventEmitter
+          client = new Client provider_key
+          client.report report_test, (response) ->
+            promise.emit 'success', response
+          promise
+
+        'should include the 3scale user agent': (response) ->
+          nock_call_objects = nock.recorder.play()
+          last_request_headers = nock_call_objects[0].reqheaders
+          version = require('../package.json').version
+          assert.equal last_request_headers['x-3scale-user-agent'], "plugin-node-v#{version}"
+
+        'should include the default 3scale host': (response) ->
+          nock_call_objects = nock.recorder.play()
+          last_request_headers = nock_call_objects[0].reqheaders
+          assert.equal last_request_headers['host'], 'su1.3scale.net'
+
   .export module

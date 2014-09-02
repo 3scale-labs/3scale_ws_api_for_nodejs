@@ -1,6 +1,7 @@
 https = require 'https'
 querystring = require 'qs'
 libxml = require 'libxmljs'
+VERSION = require('../package.json').version
 
 Response = require './response'
 AuthorizeResponse = require './authorize_response'
@@ -14,15 +15,15 @@ AuthorizeResponse = require './authorize_response'
     Client = require('3scale').Client
     client = new Client(provider_key, [default_host])
 ###
-#
+
 module.exports = class Client
+  DEFAULT_HEADERS: { "X-3scale-User-Agent": "plugin-node-v#{VERSION}" }
 
   constructor: (provider_key, default_host = "su1.3scale.net") ->
     unless provider_key?
       throw new Error("missing provider_key")
     @provider_key = provider_key
     @host = default_host
-
 
   ###
     Authorize a application
@@ -55,11 +56,13 @@ module.exports = class Client
     query = querystring.stringify options
     query += '&' + querystring.stringify {provider_key: @provider_key}
 
-    req_opts = 
+    req_opts =
       host:   @host
       port:   443
       path:   url + query
       method: 'GET'
+      headers: @DEFAULT_HEADERS
+
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
       xml = ""
@@ -101,11 +104,13 @@ module.exports = class Client
     query = querystring.stringify options
     query += '&' + querystring.stringify {provider_key: @provider_key}
 
-    req_opts = 
+    req_opts =
       host:   @host
       port:   443
       path:   url + query
       method: 'GET'
+      headers: @DEFAULT_HEADERS
+
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
       xml = ""
@@ -148,11 +153,13 @@ module.exports = class Client
     query = querystring.stringify options
     query += '&' + querystring.stringify {provider_key: @provider_key}
 
-    req_opts = 
+    req_opts =
       host:   @host
       port:   443
       path:   url + query
       method: 'GET'
+      headers: @DEFAULT_HEADERS
+
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
       xml = ""
@@ -172,7 +179,7 @@ module.exports = class Client
     Authorize and Report in single call
       options is a Hash object with the following fields
         app_id Required
-        app_key, user_id, object, usage, no-body, service_id Optional 
+        app_key, user_id, object, usage, no-body, service_id Optional
       callback {Function} Is the callback function that receives the Response object which includes `is_success`
               method to determine the status of the response
 
@@ -193,11 +200,13 @@ module.exports = class Client
     query = querystring.stringify options
     query += '&' + querystring.stringify {provider_key: @provider_key}
 
-    req_opts = 
+    req_opts =
       host:   @host
       port:   443
       path:   url + query
       method: 'GET'
+      headers: @DEFAULT_HEADERS
+
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
       xml = ""
@@ -226,11 +235,13 @@ module.exports = class Client
     query = querystring.stringify options
     query += '&' + querystring.stringify {provider_key: @provider_key}
 
-    req_opts = 
+    req_opts =
       host:   @host
       port:   443
       path:   url + query
       method: 'GET'
+      headers: @DEFAULT_HEADERS
+
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
       xml = ""
@@ -244,7 +255,7 @@ module.exports = class Client
           callback _self._build_error_response xml
         else
           throw "[Client::authrep_with_user_key] Server Error Code: #{response.statusCode}"
-    request.end()  
+    request.end()
 
   ###
     Report transaction(s).
@@ -289,12 +300,18 @@ module.exports = class Client
     params.service_id = service_id if service_id
     query = querystring.stringify(params).replace(/\[/g, "%5B").replace(/\]/g, "%5D")
 
-    req_opts = 
+    req_opts =
       host:    @host
       port:    443
       path:    url
       method:  'POST'
-      headers: {"host": @host, "Content-Type": "application/x-www-form-urlencoded", "Content-Length": query.length}
+      headers:
+        "host": @host
+        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Length": query.length
+
+    req_opts.headers[key] = value for key, value of @DEFAULT_HEADERS
+
     request = https.request req_opts, (response) ->
       xml = ""
       response.on "data", (data) ->
@@ -317,7 +334,7 @@ module.exports = class Client
     doc = libxml.parseXml xml
     authorize = doc.get('//authorized').text()
     plan = doc.get('//plan').text()
-    
+
     if authorize is 'true'
       response.success()
     else
@@ -337,7 +354,7 @@ module.exports = class Client
             current_value: usage_report.get('current_value').text()
             max_value: usage_report.get('max_value').text()
           response.add_usage_reports report
-    
+
     response
 
   _build_error_response: (xml) ->
