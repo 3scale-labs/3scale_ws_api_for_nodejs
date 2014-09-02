@@ -3,6 +3,8 @@ node_js:
 - 0.6
 - 0.8
 - 0.1
+before_install:
+  - npm install -g npm@~1.4.6
 env:
   global:
   - TEST_3SCALE_APP_ID=4d4b20b9
