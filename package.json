@@ -13,7 +13,8 @@
     "Michal Cichra <michal@3scale.net>",
     "Daniel Stevens <daniel.stevens@senicolabs.com>",
     "Chaitanya Surapaneni <chaitanya.surapaneni@senicolabs.com>",
-    "Joaquin Rivera (joahking) <joaquin@3scale.net>"
+    "Joaquin Rivera (joahking) <joaquin@3scale.net>",
+    "Victor Delgado <victor@3scale.net>"
   ],
   "main": "lib/index.js",
   "bugs": {
@@ -38,11 +39,11 @@
   },
   "devDependencies": {
     "coffee-script": "1.x",
-    "nock": "^0.46.0",
+    "nock": "0.46.0",
     "vows": "0.5.x"
   },
   "engines": {
-    "node": "0.8.x"
+    "node": ">=0.8.0"
   },
   "optionalDependencies": {}
 }
