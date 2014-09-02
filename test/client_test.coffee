@@ -167,6 +167,11 @@ vows
           version = require('../package.json').version
           assert.equal last_request_headers['x-3scale-user-agent'], "plugin-node-v#{version}"
 
+        'should include the default 3scale host': (response) ->
+          nock_call_objects = nock.recorder.play()
+          last_request_headers = nock_call_objects[0].reqheaders
+          assert.equal last_request_headers['host'], 'su1.3scale.net'
+
       'in report calls':
         topic: ->
           promise = new events.EventEmitter
@@ -180,5 +185,10 @@ vows
           last_request_headers = nock_call_objects[0].reqheaders
           version = require('../package.json').version
           assert.equal last_request_headers['x-3scale-user-agent'], "plugin-node-v#{version}"
+
+        'should include the default 3scale host': (response) ->
+          nock_call_objects = nock.recorder.play()
+          last_request_headers = nock_call_objects[0].reqheaders
+          assert.equal last_request_headers['host'], 'su1.3scale.net'
 
   .export module
