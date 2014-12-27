@@ -98,6 +98,19 @@ client.oauth_authorize({"app_id": "your application id"}, function(response){
   }
 });
 ```
+### Signup
+
+If you signup your users of your API using 3scale API, you will need to put all the information of your user inside the first argument of the method with a JSON
+
+```javascript
+var Client = require('3scale').Client;
+
+client = new Client("your provider key", "YourAPIaccount-admin.3scale.net");
+
+client.signup({"org_name": "the organisation of the user", "username": "his username", "email": "his email", "password": "his password not hashed" }, function(response){
+  console.log(response);
+});
+```
 
 ## To test
 

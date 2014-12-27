@@ -327,6 +327,59 @@ module.exports = class Client
     request.write query
     request.end()
 
+    ###
+        Signup Express
+
+    Parameters:
+      
+      options {Array} each array element contain information of a transaction. That information is in a Hash in the form
+      {
+        org_name  (required) Organization Name of the buyer account.
+        username  (required) Username of the admin user (on the new buyer account).
+        email  (required)  Email of the admin user.
+        password (required) Password of the admin user.
+        account_plan_id (optional) id of the account plan - if not assigned default will be used instead.
+        service_plan_id  (optional) id of the service plan - if not assigned default will be used instead.
+        application_plan_id  (optional) id of the application plan (if not assigned default will be used instead.
+        additional_fields (Additional fields have to be name and value. You can add as many as you want.)
+        additional_field2
+        additional_field3
+        ...
+      }
+      callback {Function} Function that recive the Response object which include a `is_success` method. Required
+
+  ###
+  signup: (options, callback) ->
+    _self = this
+    
+    url = "/admin/api/signup.xml"
+    query = querystring.stringify options
+    query += '&' + querystring.stringify {provider_key: @provider_key}
+
+    req_opts =
+      host:   @host
+      port:   443
+      path:   url
+      method: 'POST'
+      headers:
+        "host": @host
+        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Length": query.length
+
+    req_opts.headers[key] = value for key, value of @DEFAULT_HEADERS
+
+    request = https.request req_opts, (response) ->
+      xml = ""
+      response.on "data", (data) ->
+        xml += data
+
+      response.on 'end', () ->
+        if response.statusCode == 201
+          callback xml
+        else if response.statusCode == 403
+          callback _self._build_error_response xml
+    request.write query
+    request.end()
 
   # privates methods
   _build_success_authorize_response: (xml) ->
