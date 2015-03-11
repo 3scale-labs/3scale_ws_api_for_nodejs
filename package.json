@@ -1,7 +1,7 @@
 {
   "name": "3scale",
   "description": "Client for 3Scale Networks API",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "homepage": "http://www.3scale.net",
   "repository": {
     "type": "git",
