@@ -195,6 +195,7 @@ module.exports = class Client
     _self = this
     if (typeof options isnt 'object') || (options.app_id is undefined)
       throw "missing app_id"
+    options.usage || options.usage = { hits: 1 }
 
     url = "/transactions/authrep.xml?"
     query = querystring.stringify options
