@@ -4,6 +4,11 @@
 Includes a configurable API dashboard and developer portal CMS.
 More product stuff at http://www.3scale.net/, support information at http://support.3scale.net/.
 
+## Installation
+
+The module is delivered through the package manager npm, so that the installation should be easy as: `npm install 3scale`
+
+
 ## Requirements
 
 * libxml2 library
@@ -20,10 +25,6 @@ This plugin supports the 3 main calls to the 3scale backend:
 - report reports traffic on your API.
 
 3scale supports 3 authentication modes: App Id, User Key and OAuth. The first two are similar on their calls to the backend, they support authrep. OAuth differs in its usage two calls are required: first authorize then report.
-
-## Installation
-
-The module is delivered through the package manager npm, so that the installation should be easy as: `npm install 3scale`
 
 ## Usage
 
