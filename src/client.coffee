@@ -5,6 +5,8 @@ VERSION = require('../package.json').version
 
 Response = require './response'
 AuthorizeResponse = require './authorize_response'
+HttpsProxyAgent = require 'https-proxy-agent'
+agent = null
 
 ###
   3Scale client API
@@ -19,11 +21,14 @@ AuthorizeResponse = require './authorize_response'
 module.exports = class Client
   DEFAULT_HEADERS: { "X-3scale-User-Agent": "plugin-node-v#{VERSION}" }
 
-  constructor: (provider_key, default_host = "su1.3scale.net") ->
+  constructor: (provider_key, default_host = "su1.3scale.net", proxyUrl) ->
     unless provider_key?
       throw new Error("missing provider_key")
     @provider_key = provider_key
     @host = default_host
+    if proxyUrl
+      agent = new HttpsProxyAgent(proxyUrl);
+
 
   ###
     Authorize a application
@@ -62,6 +67,8 @@ module.exports = class Client
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
+    if agent
+      req_opts.agent = agent
 
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
@@ -71,11 +78,13 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback null, _self._build_success_authorize_response xml
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback null, _self._build_error_response xml
         else
           throw "[Client::authorize] Server Error Code: #{response.statusCode}"
+    request.on 'error', (err) ->
+      callback err
     request.end()
 
   ###
@@ -110,6 +119,8 @@ module.exports = class Client
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
+    if agent
+      req_opts.agent = agent
 
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
@@ -119,11 +130,13 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback null, _self._build_success_authorize_response xml
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback null, _self._build_error_response xml
         else
           throw "[Client::oauth_authorize] Server Error Code: #{response.statusCode}"
+    request.on 'error', (err) ->
+      callback err
     request.end()
 
   ###
@@ -159,6 +172,8 @@ module.exports = class Client
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
+    if agent
+      req_opts.agent = agent
 
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
@@ -168,11 +183,13 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback null, _self._build_success_authorize_response xml
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback null, _self._build_error_response xml
         else
           throw "[Client::authorize_with_user_key] Server Error Code: #{response.statusCode}"
+    request.on 'error', (err) ->
+      callback err
     request.end()
 
   ###
@@ -207,6 +224,8 @@ module.exports = class Client
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
+    if agent
+      req_opts.agent = agent
 
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
@@ -216,11 +235,13 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback null, _self._build_success_authorize_response xml
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback null, _self._build_error_response xml
         else
           throw "[Client::authrep] Server Error Code: #{response.statusCode}"
+    request.on 'error', (err) ->
+      callback err
     request.end()
 
   ###
@@ -242,6 +263,8 @@ module.exports = class Client
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
+    if agent
+      req_opts.agent = agent
 
     request = https.request req_opts, (response) ->
       response.setEncoding 'utf8'
@@ -251,11 +274,13 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback null, _self._build_success_authorize_response xml
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback null, _self._build_error_response xml
         else
           throw "[Client::authrep_with_user_key] Server Error Code: #{response.statusCode}"
+    request.on 'error', (err) ->
+      callback err
     request.end()
 
   ###
@@ -310,6 +335,8 @@ module.exports = class Client
         "host": @host
         "Content-Type": "application/x-www-form-urlencoded"
         "Content-Length": query.length
+    if agent
+      req_opts.agent = agent
 
     req_opts.headers[key] = value for key, value of @DEFAULT_HEADERS
 
