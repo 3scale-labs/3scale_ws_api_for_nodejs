@@ -35,7 +35,8 @@
   },
   "dependencies": {
     "libxmljs": "*",
-    "qs": "*"
+    "qs": "*",
+    "https-proxy-agent": "*"
   },
   "devDependencies": {
     "coffee-script": "1.x",

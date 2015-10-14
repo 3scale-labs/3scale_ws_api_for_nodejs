@@ -35,7 +35,7 @@ Authrep is a 'one-shot' operation to authorize an application and report the ass
 ```javascript
 var Client = require('3scale').Client;
 
-client = new Client("your provider key");
+client = new Client("your provider key",["3Scale URL(default : su1.3scale.net)"],["proxy URL"]);
 
 client.authrep({"app_id": "your application id", "app_key": "your application key", "usage": { "hits": 1 } }, function(response){
   sys.log(sys.inspect(response));
@@ -52,8 +52,9 @@ var Client = require('3scale').Client;
 
 client = new Client("your provider key");
 
-client.authorize({"app_id": "your application id", "app_key": "your application key"}, function(response){
-  if (response.is_success()) {
+client.authorize({"app_id": "your application id", "app_key": "your application key"}, function(error, response){
+  if(error) {console.err(error);}
+  else if (response.is_success()) {
     var trans = [{"app_id": "your application id", "usage": {"hits": 3}}];
     client.report(trans, function (response) {
       console.log(response);
@@ -87,8 +88,9 @@ var Client = require('3scale').Client;
 
 client = new Client("your provider key");
 
-client.oauth_authorize({"app_id": "your application id"}, function(response){
-  if (response.is_success()) {
+client.oauth_authorize({"app_id": "your application id"}, function(error, response){
+  if(error) {console.err(error);}
+  else if (response.is_success()) {
     var trans = [{"app_id": "your application id", "usage": {"hits": 3}}];
     client.report(trans, function (response) {
       console.log(response);
