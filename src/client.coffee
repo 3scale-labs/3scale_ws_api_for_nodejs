@@ -1,6 +1,9 @@
 https = require 'https'
 querystring = require 'qs'
-libxml = require 'libxmljs'
+Q = require 'q'
+xml2js = require "xml2js"
+parser = new xml2js.Parser({explicitArray:false,mergeAttrs:true,explicitAttrs: true,charkey:"text"})
+
 VERSION = require('../package.json').version
 
 Response = require './response'
@@ -18,6 +21,7 @@ AuthorizeResponse = require './authorize_response'
 
 module.exports = class Client
   DEFAULT_HEADERS: { "X-3scale-User-Agent": "plugin-node-v#{VERSION}" }
+
 
   constructor: (provider_key, default_host = "su1.3scale.net") ->
     unless provider_key?
@@ -328,41 +332,70 @@ module.exports = class Client
     request.write query
     request.end()
 
+  _parseXML = (xml) ->
+    q = Q.defer()
+    parser.parseString xml, (err, res) ->
+      if err
+        q.reject err
+      else
+        q.resolve res
+      return
+    q.promise
 
   # privates methods
   _build_success_authorize_response: (xml) ->
     response = new AuthorizeResponse()
-    doc = libxml.parseXml xml
-    authorize = doc.get('//authorized').text()
-    plan = doc.get('//plan').text()
+    doc = _parseXML(xml).valueOf()
+    authorize = doc.status.authorized
+    plan = doc.status.plan
 
-    if authorize is 'true'
+    if authorize == 'true'
       response.success()
     else
-      reason = doc.get('//reason').text()
+      reason = doc.status.reason
       response.error(reason)
+    # authorize = doc.get('//authorized').text()
+    # plan = doc.get('//plan').text()
+    #
+    # if authorize is 'true'
+    #   response.success()
+    # else
+    #   reason = doc.get('//reason').text()
+    #   response.error(reason)
 
-    usage_reports = doc.get '//usage_reports'
+    usage_reports = doc.status.usage_reports
 
     if usage_reports
-      for index, usage_report of usage_reports.childNodes()
+      for index, usage_report of usage_reports.usage_report
         do (usage_report) ->
           report =
-            period: usage_report.attr('period').value()
-            metric: usage_report.attr('metric').value()
-            period_start: if @period is not 'eternity' then usage_report.get('period_start').text()
-            period_end: if @period is not 'eternity' then usage_report.get('period_end').text()
-            current_value: usage_report.get('current_value').text()
-            max_value: usage_report.get('max_value').text()
+            period: usage_report['$'].period
+            metric: usage_report['$'].metric
+            period_start: if @period isnt 'eternity' then usage_report.period_start
+            period_end: if @period isnt 'eternity' then usage_report.period_start
+            current_value: usage_report.current_value
+            max_value: usage_report.max_value
           response.add_usage_reports report
+    #
+    # if usage_reports
+    #   for index, usage_report of usage_reports.childNodes()
+    #     do (usage_report) ->
+    #       report =
+    #         period: usage_report.attr('period').value()
+    #         metric: usage_report.attr('metric').value()
+    #         period_start: if @period is not 'eternity' then usage_report.get('period_start').text()
+    #         period_end: if @period is not 'eternity' then usage_report.get('period_end').text()
+    #         current_value: usage_report.get('current_value').text()
+    #         max_value: usage_report.get('max_value').text()
+    #       response.add_usage_reports report
 
     response
 
   _build_error_response: (xml) ->
     response = new AuthorizeResponse()
-    doc = libxml.parseXml xml
-    error = doc.get '/error'
+    doc = _parseXML(xml).valueOf()
+    error = doc.error
 
     response = new Response()
-    response.error error.text(), error.attr('code').value()
+    response.error error.text, error.code
     response

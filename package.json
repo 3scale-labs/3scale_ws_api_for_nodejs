@@ -27,15 +27,16 @@
     "web"
   ],
   "scripts": {
-    "prepublish": "coffee --bare -o lib -c src",
+    "prepublish": "",
     "test": "vows test/* --spec"
   },
   "directories": {
     "lib": "./lib"
   },
   "dependencies": {
-    "libxmljs": "*",
-    "qs": "*"
+    "qs": "*",
+    "q":"*",
+    "xml2js":"*"
   },
   "devDependencies": {
     "coffee-script": "1.x",
