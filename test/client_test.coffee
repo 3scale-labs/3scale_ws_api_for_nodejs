@@ -1,194 +1,122 @@
-# Set environment variables for tests that run against the 3scale API or use dummy keys
+assert = require 'assert'
+nock   = require 'nock'
+
+# set keys as environment variables for tests that
+# run against the 3scale API or use dummy keys
 provider_key = process.env.TEST_3SCALE_PROVIDER_KEY
 application_key = process.env.TEST_3SCALE_APP_KEY
 application_id = process.env.TEST_3SCALE_APP_ID
 
 trans = [
-  { "app_id": application_id, "usage": {"hits": 1}},
-  { "app_id": application_id, "usage": {"hits": 1000}}
+  { 'app_id': application_id, 'usage': { 'hits': 1 } },
+  { 'app_id': application_id, 'usage': { 'hits': 1000 } }
 ]
 report_test = {transactions: trans, provider_key: provider_key}
 
-events = require('events')
-vows = require('vows')
-assert = require('assert')
-nock = require('nock')
-
-# Object to testing
 Client = require('../src/client')
 
-vows
-  .describe("Basic test for the 3Scale::Client")
-  .addBatch
-    'A client ':
-      topic: -> Client
-      'should throw an exception if init without provider_key': (Client) ->
-        call = -> new Client()
-        assert.throws call, "missing provider_key"
-        return
+describe 'Basic test for the 3Scale::Client', ->
+  describe 'A client', ->
+    it 'should throw an exception if init without provider_key', ->
+      call = -> new Client()
+      assert.throws call, 'missing provider_key'
 
-      'should have an default host': (Client) ->
-        client = new Client(123)
-        assert.equal client.host, "su1.3scale.net"
-        return
+    it 'should have an default host', ->
+      client = new Client(123)
+      assert.equal client.host, 'su1.3scale.net'
 
-      'can change the default host': (Client) ->
-        client = new Client(123, 'example.com')
-        assert.equal client.host, "example.com"
-        return
+    it 'can change the default host', ->
+      client = new Client(123, 'example.com')
+      assert.equal client.host, 'example.com'
 
-      'should have an authorize method': (Client) ->
-        client = new Client(provider_key)
-        assert.isFunction client.authorize
-        return
+    it 'should have an authorize method', ->
+      client = new Client(provider_key)
+      assert.equal typeof client.authorize, 'function'
 
-      'should throw an exception if authorize method is called without :app_id': (Client) ->
-        client = new Client(provider_key)
-        assert.throws (() -> client.authorize({}, () ->)),  "missing app_id"
-        return
+    it 'should throw an exception if authorize method is called without :app_id', ->
+      client = new Client(provider_key)
+      assert.throws (() -> client.authorize({}, () ->)), 'missing app_id'
 
-      'should have an oauth_authorize method': (Client) ->
-        client = new Client(provider_key)
-        assert.isFunction client.oauth_authorize
-        return
+    it 'should have an oauth_authorize method', ->
+      client = new Client(provider_key)
+      assert.equal typeof client.oauth_authorize, 'function'
 
-      'should throw an exception if oauth_authorize method is called without :app_id': (Client) ->
-        client = new Client(provider_key)
-        assert.throws (() ->  client.oauth_authorize({}, () ->)), "missing app_id"
-        return
+    it 'should throw an exception if oauth_authorize method is called without :app_id', ->
+      client = new Client(provider_key)
+      assert.throws (() ->  client.oauth_authorize({}, () ->)), 'missing app_id'
 
-      'should have an authorize_with_user_key method': (Client) ->
-        client = new Client(provider_key)
-        assert.isFunction client.authorize_with_user_key
-        return
+    it 'should have an authorize_with_user_key method', ->
+      client = new Client(provider_key)
+      assert.equal typeof client.authorize_with_user_key, 'function'
 
-      'should throw an exception if authorize_with_user_key is called without :user_key': (Client) ->
-        client = new Client(provider_key)
-        assert.throws (() -> client.authorize_with_user_key({}, () ->)), "missing user_key"
-        return
+    it 'should throw an exception if authorize_with_user_key is called without :user_key', ->
+      client = new Client(provider_key)
+      assert.throws (() -> client.authorize_with_user_key({}, () ->)), 'missing user_key'
 
-      'should have an authrep method': (Client) ->
-        client = new Client(provider_key)
-        assert.isFunction client.authrep
-        return
+    it 'should have an authrep method', ->
+      client = new Client(provider_key)
+      assert.equal typeof client.authrep, 'function'
 
-      'should throw an exception if authrep called without :app_id': (Client) ->
-        client = new Client(provider_key)
-        assert.throws (() -> client.authrep({}, () ->)), "missing app_id"
-        return
+    it 'should throw an exception if authrep called without :app_id', ->
+      client = new Client(provider_key)
+      assert.throws (() -> client.authrep({}, () ->)), 'missing app_id'
 
-      'should have an authrep_with_user_key method': (Client) ->
-        client = new Client(provider_key)
-        assert.isFunction client.authrep_with_user_key
+    it 'should have an authrep_with_user_key method', ->
+      client = new Client(provider_key)
+      assert.equal typeof client.authrep_with_user_key, 'function'
 
-      'should throw an exception if authrep_with_user_key is called without :user_key': (Client) ->
-        client = new Client(provider_key)
-        assert.throws (() -> client.authrep_with_user_key({}, ()->)), 'missing user_key'
+    it 'should throw an exception if authrep_with_user_key is called without :user_key', ->
+      client = new Client(provider_key)
+      assert.throws (() -> client.authrep_with_user_key({}, ()->)), 'missing user_key'
 
-    'The authorize method should':
-      topic: ->
-        promise = new events.EventEmitter
-        client = new Client provider_key
-        client.authorize {app_key: application_key, app_id: application_id}, (response) ->
-          if response.is_success
-            promise.emit 'success', response
-          else
-            promise.else 'error', response
+  describe 'The authorize method', ->
+    it 'should call the callback with a successful response', (done) ->
+      client = new Client provider_key
+      client.authorize {app_key: application_key, app_id: application_id}, (response) ->
+        assert response.is_success()
+        done()
 
-        promise
+    it 'should call the callback with a error response if app_id was wrong', (done) ->
+      client = new Client provider_key
+      client.authorize {app_key: application_key, app_id: 'ERROR'}, (response) ->
+        assert.equal response.is_success(), false
+        done()
 
-      'call the callback with the AuthorizeResponse': (response) ->
-        assert.isTrue response.is_success()
+  describe 'The report method', ->
+    it 'should give a success response with the correct params', (done) ->
+      client = new Client provider_key
+      client.report report_test, (response) ->
+        assert response.is_success()
+        done()
 
-    'The oauth_authorize method should': 'TODO'
-    ###
-      topic: ->
-        promise = new events.EventEmitter
-        client = new Client oauth_provider_key
-        client.oauth_authorize {app_id: oauth_application_id}, (response) ->
-          if response.is_success
-            promise.emit 'success', response
-          else
-            promise.else 'error', response
+  describe 'Request headers in authrep calls', ->
+    it 'should include the Host and X-3scale-User-Agent headers', (done) ->
+      opts =
+        reqheaders:
+          'Host': 'su1.3scale.net'
+          'X-3scale-User-Agent': 'plugin-node-v' + require('../package.json').version
 
-        promise
+      match = nock('https://su1.3scale.net', opts)
+        .get('/transactions/authorize.xml?app_id=foo&provider_key=1234abcd')
+        .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
 
-      'call the callback with the AuthorizeResponse': (response) ->
-        assert.isTrue response.is_success()
-    ###
+      client = new Client '1234abcd'
+      client.authorize { app_id: 'foo' }, (response) ->
+        assert match.isDone()
+        done()
 
-    'The Event Emitter':
-      topic: ->
-        promise = new events.EventEmitter
-        client = new Client provider_key
-        client.authorize {app_key: application_key, app_id: application_id + 'ERROR'}, (response) ->
-          promise.emit 'success', response
+  describe 'Request headers in report calls', ->
+    it 'should include the Host and X-3scale-User-Agent headers', (done) ->
+      opts =
+        reqheaders:
+          'Host': 'su1.3scale.net'
+          'X-3scale-User-Agent': 'plugin-node-v' + require('../package.json').version
 
-        promise
+      match = nock('https://su1.3scale.net', opts)
+        .post('/transactions.xml')
+        .reply(202)
 
-      'call the callback with a error response if app_id was wrong': (response) ->
-        assert.isFalse response.is_success()
-
-    'In the transaction method should':
-        topic:->
-          promise = new events.EventEmitter
-          client = new Client provider_key
-          client.report report_test, (response) ->
-            promise.emit 'success', response
-
-          promise
-
-        'give a success response with the correct params': (response) ->
-          assert.isTrue response.is_success()
-
-    'Request headers ':
-      topic: ->
-        nock.recorder.rec({
-          output_objects: true,
-          dont_print: true,
-          enable_reqheaders_recording: true
-        })
-        return null
-
-      'in authorize calls':
-        topic: ->
-          promise = new events.EventEmitter
-          client = new Client provider_key
-          client.authorize {app_key: application_key, app_id: application_id}, (response) ->
-            if response.is_success
-              promise.emit 'success', response
-            else
-              promise.else 'error', response
-          promise
-
-        'should include the 3scale user agent': (response) ->
-          nock_call_objects = nock.recorder.play()
-          last_request_headers = nock_call_objects[0].reqheaders
-          version = require('../package.json').version
-          assert.equal last_request_headers['x-3scale-user-agent'], "plugin-node-v#{version}"
-
-        'should include the default 3scale host': (response) ->
-          nock_call_objects = nock.recorder.play()
-          last_request_headers = nock_call_objects[0].reqheaders
-          assert.equal last_request_headers['host'], 'su1.3scale.net'
-
-      'in report calls':
-        topic: ->
-          promise = new events.EventEmitter
-          client = new Client provider_key
-          client.report report_test, (response) ->
-            promise.emit 'success', response
-          promise
-
-        'should include the 3scale user agent': (response) ->
-          nock_call_objects = nock.recorder.play()
-          last_request_headers = nock_call_objects[0].reqheaders
-          version = require('../package.json').version
-          assert.equal last_request_headers['x-3scale-user-agent'], "plugin-node-v#{version}"
-
-        'should include the default 3scale host': (response) ->
-          nock_call_objects = nock.recorder.play()
-          last_request_headers = nock_call_objects[0].reqheaders
-          assert.equal last_request_headers['host'], 'su1.3scale.net'
-
-  .export module
+      client = new Client '1234abcd'
+      client.report report_test, (response) ->
+        assert match.isDone()
+        done()

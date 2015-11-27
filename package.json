@@ -28,7 +28,7 @@
   ],
   "scripts": {
     "prepublish": "coffee --bare -o lib -c src",
-    "test": "vows test/* --spec"
+    "test": "mocha --compilers coffee:coffee-script/register test/*"
   },
   "directories": {
     "lib": "./lib"
@@ -38,9 +38,9 @@
     "qs": "*"
   },
   "devDependencies": {
-    "coffee-script": "1.x",
-    "nock": "0.46.0",
-    "vows": "0.8.x"
+    "coffee-script": "^1.10.0",
+    "mocha": "^2.3.4",
+    "nock": "^3.3.2"
   },
   "engines": {
     "node": ">=0.8.0",
