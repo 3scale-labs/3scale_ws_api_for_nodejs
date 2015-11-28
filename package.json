@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "libxmljs": "*",
-    "qs": "*"
+    "qs": "^5.2.0"
   },
   "devDependencies": {
     "coffee-script": "^1.10.0",
