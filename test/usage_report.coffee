@@ -35,6 +35,8 @@ describe 'Usage report tests for 3Scale::Client', ->
       assert.equal response.error_message, 'usage limits are exceeded'
       assert.equal response.usage_reports[0].metric, 'hits'
       assert.equal response.usage_reports[0].period, 'day'
+      assert.equal response.usage_reports[0].period_start, '2010-04-26 00:00:00 +0000'
+      assert.equal response.usage_reports[0].period_end, '2010-04-27 00:00:00 +0000'
       assert.equal response.usage_reports[0].current_value, '50002'
       assert.equal response.usage_reports[0].max_value, '50000'
       done()
