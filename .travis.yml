@@ -2,12 +2,11 @@ language: node_js
 sudo: false
 cache: npm
 node_js:
-- "0.8"
 - "0.10"
 - "0.12"
 - "4"
 before_install:
-  - npm install -g npm@~1.4.6
+  - npm install -g npm@2
 env:
   global:
   - TEST_3SCALE_APP_ID=4d4b20b9
