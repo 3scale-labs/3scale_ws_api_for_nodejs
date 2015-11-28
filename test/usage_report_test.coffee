@@ -1,12 +1,6 @@
 assert = require 'assert'
 nock   = require 'nock'
 
-# set keys as environment variables for tests that
-# run against the 3scale API or use dummy keys
-provider_key = process.env.TEST_3SCALE_PROVIDER_KEY
-application_key = process.env.TEST_3SCALE_APP_KEY
-application_id = process.env.TEST_3SCALE_APP_ID
-
 Client = require('../src/client')
 
 describe 'Usage report tests for 3Scale::Client', ->
