@@ -350,8 +350,8 @@ module.exports = class Client
           report =
             period: usage_report.attr('period').value()
             metric: usage_report.attr('metric').value()
-            period_start: if @period is not 'eternity' then usage_report.get('period_start').text()
-            period_end: if @period is not 'eternity' then usage_report.get('period_end').text()
+            period_start: if @period isnt 'eternity' then usage_report.get('period_start').text()
+            period_end: if @period isnt 'eternity' then usage_report.get('period_end').text()
             current_value: usage_report.get('current_value').text()
             max_value: usage_report.get('max_value').text()
           response.add_usage_reports report
