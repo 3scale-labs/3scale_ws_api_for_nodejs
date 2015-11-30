@@ -13,7 +13,7 @@ The module is delivered through the package manager npm, so that the installatio
 
 * libxml2 library
 
-Starting at version 0.5.0, this plugin requires using **Node.js versions 0.8.x or higher**. Node.js 0.6.x is no longer supported due to incompatibilities that break the tests.
+Starting at version 0.6.0, this plugin requires using **Node.js versions 0.10.x or higher**.
 
 
 ## Synopsis
