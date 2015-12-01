@@ -354,14 +354,6 @@ module.exports = class Client
     else
       reason = doc.status.reason
       response.error(reason)
-    # authorize = doc.get('//authorized').text()
-    # plan = doc.get('//plan').text()
-    #
-    # if authorize is 'true'
-    #   response.success()
-    # else
-    #   reason = doc.get('//reason').text()
-    #   response.error(reason)
 
     usage_reports = doc.status.usage_reports
 
@@ -376,18 +368,6 @@ module.exports = class Client
             current_value: usage_report.current_value
             max_value: usage_report.max_value
           response.add_usage_reports report
-    #
-    # if usage_reports
-    #   for index, usage_report of usage_reports.childNodes()
-    #     do (usage_report) ->
-    #       report =
-    #         period: usage_report.attr('period').value()
-    #         metric: usage_report.attr('metric').value()
-    #         period_start: if @period is not 'eternity' then usage_report.get('period_start').text()
-    #         period_end: if @period is not 'eternity' then usage_report.get('period_end').text()
-    #         current_value: usage_report.get('current_value').text()
-    #         max_value: usage_report.get('max_value').text()
-    #       response.add_usage_reports report
 
     response
 

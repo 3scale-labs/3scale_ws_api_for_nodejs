@@ -1,7 +1,7 @@
 {
   "name": "3scale",
   "description": "Client for 3Scale Networks API",
-  "version": "0.5.1",
+  "version": "0.6.1",
   "homepage": "http://www.3scale.net",
   "repository": {
     "type": "git",
@@ -27,8 +27,8 @@
     "web"
   ],
   "scripts": {
-    "prepublish": "",
-    "test": "vows test/* --spec"
+    "prepublish": "coffee --bare -o lib -c src",
+    "test": "mocha --compilers coffee:coffee-script/register test/*"
   },
   "directories": {
     "lib": "./lib"
@@ -39,13 +39,13 @@
     "xml2js":"*"
   },
   "devDependencies": {
-    "coffee-script": "1.x",
-    "nock": "0.46.0",
-    "vows": "0.8.x"
+    "coffee-script": "^1.10.0",
+    "mocha": "^2.3.4",
+    "nock": "^3.3.2"
   },
   "engines": {
-    "node": ">=0.8.0",
-    "npm": ">=1.4.0"
+    "node": ">=0.10.0",
+    "npm": ">=2.0.0"
   },
   "optionalDependencies": {}
 }
