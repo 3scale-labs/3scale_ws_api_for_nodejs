@@ -10,6 +10,9 @@ before_install:
 env:
   global:
     - CXX=g++-4.8
+    - TEST_3SCALE_APP_ID=4d4b20b9
+    - TEST_3SCALE_APP_KEY=ecce202ecc2eb8dc7a499c34a34d5987
+    - secure: B/3oWYZZttrXVM5IFn2evSuWMOQqEOOMol3nEQ2vEDGQ6rdGjpYLFDO/qMDPA8Af6Vt72lOFKkgzivuBp8nSd4S1YRTazilMle4zCJiJxzPs69kRDVXf/Mn8Qr/YrmgVzhblvdNqbKxTGrYyvDziPkliQKtIhqyILm3d6+CqmYw=
 addons:
   apt:
     sources:
