@@ -28,7 +28,8 @@
   ],
   "scripts": {
     "prepublish": "coffee --bare -o lib -c src",
-    "test": "mocha --compilers coffee:coffee-script/register test/*"
+    "test": "mocha --compilers coffee:coffee-script/register test/* -if 'Integration'",
+    "test-all": "mocha --compilers coffee:coffee-script/register test/*"
   },
   "directories": {
     "lib": "./lib"
