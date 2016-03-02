@@ -73,6 +73,7 @@ describe 'Basic test for the 3Scale::Client', ->
       client = new Client '1234abcd'
       client.authorize {app_key: 'bar', app_id: 'foo'}, (response) ->
         assert response.is_success()
+        assert.equal response.status_code, 200
         done()
 
     it 'should call the callback with a error response if app_id was wrong', (done) ->
@@ -84,6 +85,7 @@ describe 'Basic test for the 3Scale::Client', ->
       client = new Client '1234abcd'
       client.authorize {app_key: 'bar', app_id: 'ERROR'}, (response) ->
         assert.equal response.is_success(), false
+        assert.equal response.status_code, 403
         done()
 
     after ->
