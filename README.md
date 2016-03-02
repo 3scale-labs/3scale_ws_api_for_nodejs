@@ -32,13 +32,26 @@ This plugin supports the 3 main calls to the 3scale backend:
 
 Authrep is a 'one-shot' operation to authorize an application and report the associated transaction at the same time. The main difference between this call and the regular **authorize** call is that usage will be reported if the authorization is successful. Read more about authrep at the active docs page on the [3scale's support site](https://support.3scale.net/reference/active-docs).
 
+Here is an example assuming that you are using the `app_id/app_key` authentication mode:
 ```javascript
 var Client = require('3scale').Client;
 
 client = new Client("your provider key");
 
 client.authrep({"app_id": "your application id", "app_key": "your application key", "usage": { "hits": 1 } }, function(response){
-  sys.log(sys.inspect(response));
+  console.log(response);
+});
+```
+
+In case you have your API authentication configured in 3scale to use the `user_key` mode, this would be the equivalent to the example above:
+
+```javascript
+var Client = require('3scale').Client;
+
+client = new Client("your provider key");
+
+client.authrep_with_user_key({ "user_key": "your key", "usage": { "hits": 1 } }, function(response){
+  console.log(response);
 });
 ```
 
@@ -52,9 +65,29 @@ var Client = require('3scale').Client;
 
 client = new Client("your provider key");
 
-client.authorize({"app_id": "your application id", "app_key": "your application key"}, function(response){
+client.authorize({ "app_id": "your application id", "app_key": "your application key" }, function(response){
   if (response.is_success()) {
-    var trans = [{"app_id": "your application id", "usage": {"hits": 3}}];
+    var trans = [{ "app_id": "your application id", "usage": { "hits": 3 } }];
+    client.report(trans, function (response) {
+      console.log(response);
+    });
+  } 
+  else {
+    console.log("Error: " + response.error_code + " msg: " + response.error_msg);
+  }
+});
+```
+
+Here is the same example for the `user_key` authentication pattern:
+
+```javascript
+var Client = require('3scale').Client;
+
+client = new Client("your provider key");
+
+client.authorize_with_user_key({ "user_key": "your key" }, function(response){
+  if (response.is_success()) {
+    var trans = [{ "user_key": "your key", "usage": { "hits": 3 }}];
     client.report(trans, function (response) {
       console.log(response);
     });
