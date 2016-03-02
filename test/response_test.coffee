@@ -41,7 +41,7 @@ describe 'Basic test for the 3Scale::Response', ->
 
     it 'should have a status_code of 200 after a call to success method', ->
       response = new Response()
-      response.success()
+      response.success(200)
       assert.equal response.status_code, 200
 
     it 'be false after a error method', ->

@@ -35,5 +35,5 @@ describe 'Integration tests for the 3Scale::Client', ->
       client = new Client provider_key
       client.report report_test, (response) ->
         assert response.is_success()
-        assert.equal response.status_code, 200
+        assert.equal response.status_code, 202
         done()

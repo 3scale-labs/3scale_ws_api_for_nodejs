@@ -320,9 +320,9 @@ module.exports = class Client
 
       response.on 'end', () ->
         if response.statusCode == 202
-          response = new Response()
-          response.success()
-          callback response
+          _response = new Response()
+          _response.success(response.statusCode)
+          callback _response
         else if response.statusCode == 403
           callback _self._build_error_response(response.statusCode, xml)
     request.write query

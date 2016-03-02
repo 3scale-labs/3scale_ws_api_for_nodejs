@@ -7,7 +7,7 @@ class Response
 	success: (status_code) ->
 		@error_code = null
 		@error_message = null
-		@status_code = 200
+		@status_code = status_code
     
 	error: (status_code, message, code = null) ->
 		@error_code = code
