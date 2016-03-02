@@ -20,12 +20,14 @@ describe 'Integration tests for the 3Scale::Client', ->
       client = new Client provider_key
       client.authorize {app_key: application_key, app_id: application_id}, (response) ->
         assert response.is_success()
+        assert.equal response.status_code, 200
         done()
 
     it 'should call the callback with a error response if app_id was wrong', (done) ->
       client = new Client provider_key
       client.authorize {app_key: application_key, app_id: 'ERROR'}, (response) ->
         assert.equal response.is_success(), false
+        assert.equal response.status_code, 404
         done()
 
   describe 'The report method', ->
@@ -33,4 +35,5 @@ describe 'Integration tests for the 3Scale::Client', ->
       client = new Client provider_key
       client.report report_test, (response) ->
         assert response.is_success()
+        assert.equal response.status_code, 200
         done()
