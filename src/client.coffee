@@ -71,9 +71,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback _self._build_success_authorize_response(response.statusCode, xml)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback _self._build_error_response(response.statusCode, xml)
         else
           throw "[Client::authorize] Server Error Code: #{response.statusCode}"
     request.end()
@@ -119,9 +119,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback _self._build_success_authorize_response(response.statusCode, xml)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback _self._build_error_response(response.statusCode, xml)
         else
           throw "[Client::oauth_authorize] Server Error Code: #{response.statusCode}"
     request.end()
@@ -168,9 +168,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback _self._build_success_authorize_response(response.statusCode, xml)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback _self._build_error_response(response.statusCode, xml)
         else
           throw "[Client::authorize_with_user_key] Server Error Code: #{response.statusCode}"
     request.end()
@@ -216,9 +216,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback _self._build_success_authorize_response(response.statusCode, xml)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback _self._build_error_response(response.statusCode, xml)
         else
           throw "[Client::authrep] Server Error Code: #{response.statusCode}"
     request.end()
@@ -251,9 +251,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response xml
+          callback _self._build_success_authorize_response(response.statusCode, xml)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response xml
+          callback _self._build_error_response(response.statusCode, xml)
         else
           throw "[Client::authrep_with_user_key] Server Error Code: #{response.statusCode}"
     request.end()
@@ -320,27 +320,27 @@ module.exports = class Client
 
       response.on 'end', () ->
         if response.statusCode == 202
-          response = new Response()
-          response.success()
-          callback response
+          _response = new Response()
+          _response.success(response.statusCode)
+          callback _response
         else if response.statusCode == 403
-          callback _self._build_error_response xml
+          callback _self._build_error_response(response.statusCode, xml)
     request.write query
     request.end()
 
 
-  # privates methods
-  _build_success_authorize_response: (xml) ->
+  # private methods
+  _build_success_authorize_response: (status_code, xml) ->
     response = new AuthorizeResponse()
     doc = libxml.parseXml xml
     authorize = doc.get('//authorized').text()
     plan = doc.get('//plan').text()
 
     if authorize is 'true'
-      response.success()
+      response.success(status_code)
     else
       reason = doc.get('//reason').text()
-      response.error(reason)
+      response.error(status_code, reason)
 
     usage_reports = doc.get '//usage_reports'
 
@@ -361,11 +361,10 @@ module.exports = class Client
 
     response
 
-  _build_error_response: (xml) ->
-    response = new AuthorizeResponse()
+  _build_error_response: (status_code, xml) ->
     doc = libxml.parseXml xml
     error = doc.get '/error'
 
     response = new Response()
-    response.error error.text(), error.attr('code').value()
+    response.error status_code, error.text(), error.attr('code').value()
     response

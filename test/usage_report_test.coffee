@@ -26,6 +26,7 @@ describe 'Usage report tests for 3Scale::Client', ->
     client = new Client '1234abcd'
     client.authorize { app_id: 'foo' }, (response) ->
       assert.equal response.is_success(), false
+      assert.equal response.status_code, 409
       assert.equal response.error_message, 'usage limits are exceeded'
       assert.equal response.usage_reports[0].metric, 'hits'
       assert.equal response.usage_reports[0].period, 'day'
@@ -55,6 +56,7 @@ describe 'Usage report tests for 3Scale::Client', ->
     client = new Client '1234abcd'
     client.authorize { app_id: 'foo' }, (response) ->
       assert.equal response.is_success(), false
+      assert.equal response.status_code, 409
       assert.equal response.error_message, 'usage limits are exceeded'
       assert.equal response.usage_reports[0].metric, 'hits'
       assert.equal response.usage_reports[0].period, 'eternity'
