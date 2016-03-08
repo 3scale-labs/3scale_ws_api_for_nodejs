@@ -1,10 +1,17 @@
-https = require 'https'
+https       = require 'https'
 querystring = require 'qs'
-libxml = require 'libxmljs'
-VERSION = require('../package.json').version
+xml2js      = require 'xml2js'
+Promise     = require('es6-promise').Promise
+VERSION     = require('../package.json').version
 
-Response = require './response'
+Response          = require './response'
 AuthorizeResponse = require './authorize_response'
+
+parser = new xml2js.Parser
+  explicitArray: false
+  mergeAttrs: true
+  explicitAttrs: true
+  charkey: 'text'
 
 ###
   3Scale client API
@@ -71,9 +78,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response(response.statusCode, xml)
+          _self._build_success_authorize_response(response.statusCode, xml, callback)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response(response.statusCode, xml)
+          _self._build_error_response(response.statusCode, xml, callback)
         else
           throw "[Client::authorize] Server Error Code: #{response.statusCode}"
     request.end()
@@ -119,9 +126,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response(response.statusCode, xml)
+          _self._build_success_authorize_response(response.statusCode, xml, callback)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response(response.statusCode, xml)
+          _self._build_error_response(response.statusCode, xml, callback)
         else
           throw "[Client::oauth_authorize] Server Error Code: #{response.statusCode}"
     request.end()
@@ -168,9 +175,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response(response.statusCode, xml)
+          _self._build_success_authorize_response(response.statusCode, xml, callback)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response(response.statusCode, xml)
+          _self._build_error_response(response.statusCode, xml, callback)
         else
           throw "[Client::authorize_with_user_key] Server Error Code: #{response.statusCode}"
     request.end()
@@ -216,9 +223,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response(response.statusCode, xml)
+          _self._build_success_authorize_response(response.statusCode, xml, callback)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response(response.statusCode, xml)
+          _self._build_error_response(response.statusCode, xml, callback)
         else
           throw "[Client::authrep] Server Error Code: #{response.statusCode}"
     request.end()
@@ -251,9 +258,9 @@ module.exports = class Client
 
       response.on 'end', ->
         if response.statusCode == 200 || response.statusCode == 409
-          callback _self._build_success_authorize_response(response.statusCode, xml)
+          _self._build_success_authorize_response(response.statusCode, xml, callback)
         else if response.statusCode in [400...409]
-          callback _self._build_error_response(response.statusCode, xml)
+          _self._build_error_response(response.statusCode, xml, callback)
         else
           throw "[Client::authrep_with_user_key] Server Error Code: #{response.statusCode}"
     request.end()
@@ -324,47 +331,57 @@ module.exports = class Client
           _response.success(response.statusCode)
           callback _response
         else if response.statusCode == 403
-          callback _self._build_error_response(response.statusCode, xml)
+          _self._build_error_response(response.statusCode, xml, callback)
     request.write query
     request.end()
 
 
   # private methods
-  _build_success_authorize_response: (status_code, xml) ->
-    response = new AuthorizeResponse()
-    doc = libxml.parseXml xml
-    authorize = doc.get('//authorized').text()
-    plan = doc.get('//plan').text()
+  _parseXML: (xml) ->
+    return new Promise (resolve, reject) ->
+      parser.parseString xml, (err, res) ->
+        if err 
+          reject(err)
+        else
+          resolve(res)
 
-    if authorize is 'true'
-      response.success(status_code)
-    else
-      reason = doc.get('//reason').text()
-      response.error(status_code, reason)
+  _build_success_authorize_response: (status_code, xml, callback) ->
+    @_parseXML(xml)
+    .catch (err) -> throw err
+    .then (doc) ->
+      response = new AuthorizeResponse()
+      authorize = doc.status.authorized
+      plan = doc.status.plan
 
-    usage_reports = doc.get '//usage_reports'
+      if authorize is 'true'
+        response.success(status_code)
+      else
+        reason = doc.status.reason
+        response.error(status_code, reason)
 
-    if usage_reports
-      for index, usage_report of usage_reports.childNodes()
-        do (usage_report) ->
-          report =
-            period: usage_report.attr('period').value()
-            metric: usage_report.attr('metric').value()
-            current_value: usage_report.get('current_value').text()
-            max_value: usage_report.get('max_value').text()
+        usage_reports = doc.status.usage_reports
+      
+      if usage_reports
+        for index, usage_report of usage_reports
+          do (usage_report) ->
+            report =
+              period: usage_report.period
+              metric: usage_report.metric
+              current_value: usage_report.current_value
+              max_value: usage_report.max_value
+            
+            if report.period isnt 'eternity'
+              report.period_start = usage_report.period_start
+              report.period_end   = usage_report.period_end
 
-          if report.period isnt 'eternity'
-            report.period_start = usage_report.get('period_start').text()
-            report.period_end = usage_report.get('period_end').text()
+            response.add_usage_reports report
+      callback(response)
 
-          response.add_usage_reports report
-
-    response
-
-  _build_error_response: (status_code, xml) ->
-    doc = libxml.parseXml xml
-    error = doc.get '/error'
-
-    response = new Response()
-    response.error status_code, error.text(), error.attr('code').value()
-    response
+  _build_error_response: (status_code, xml, callback) ->
+    @_parseXML(xml)
+    .catch (err) -> throw err
+    .then (doc) ->
+      error = doc.error
+      response = new Response()
+      response.error status_code, error.text, error.code
+      callback(response)
