@@ -11,8 +11,6 @@ The module is delivered through the package manager npm, so that the installatio
 
 ## Requirements
 
-* libxml2 library
-
 Starting at version 0.6.0, this plugin requires using **Node.js versions 0.10.x or higher**.
 
 
