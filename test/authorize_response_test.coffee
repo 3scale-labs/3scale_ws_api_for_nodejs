@@ -21,3 +21,14 @@ describe 'Basic test for the 3Scale::AuthorizeResponse', ->
       assert.equal authorize_response.usage_reports.length, 0
       authorize_response.add_usage_reports usage_report_options
       assert.equal authorize_response.usage_reports.length, 1
+
+    it 'should have a set_plan method', ->
+      authorize_response = new AuthorizeResponse()
+      assert.equal typeof authorize_response.set_plan, 'function'
+
+    it 'should be able to set a plan', ->
+      authorize_response = new AuthorizeResponse()
+      assert.equal authorize_response.plan, null
+      plan = 'Ultimate'
+      authorize_response.set_plan plan
+      assert.equal authorize_response.plan, plan
