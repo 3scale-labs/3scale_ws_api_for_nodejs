@@ -22,10 +22,13 @@ class AuthorizeResponse extends Response
 
 	constructor: (@usage_reports) ->
 		@usage_reports = []
+		@plan = null
 	
 
 	add_usage_reports: (options) ->
 		@usage_reports.push new UsageReport options
+
+	set_plan: (@plan) ->
 	
 
 module.exports = exports = AuthorizeResponse

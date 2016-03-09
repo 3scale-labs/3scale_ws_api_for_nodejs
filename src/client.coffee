@@ -352,6 +352,7 @@ module.exports = class Client
       response = new AuthorizeResponse()
       authorize = doc.status.authorized
       plan = doc.status.plan
+      usage_reports = doc.status.usage_reports
 
       if authorize is 'true'
         response.success(status_code)
@@ -359,7 +360,7 @@ module.exports = class Client
         reason = doc.status.reason
         response.error(status_code, reason)
 
-        usage_reports = doc.status.usage_reports
+      response.set_plan plan
       
       if usage_reports
         for index, usage_report of usage_reports
@@ -375,6 +376,7 @@ module.exports = class Client
               report.period_end   = usage_report.period_end
 
             response.add_usage_reports report
+
       callback(response)
 
   _build_error_response: (status_code, xml, callback) ->
