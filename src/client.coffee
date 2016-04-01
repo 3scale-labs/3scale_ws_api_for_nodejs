@@ -363,6 +363,9 @@ module.exports = class Client
       response.set_plan plan
       
       if usage_reports
+
+        usage_reports = if usage_reports.usage_report.length? then usage_reports.usage_report else [usage_reports.usage_report]
+
         for index, usage_report of usage_reports
           do (usage_report) ->
             report =
