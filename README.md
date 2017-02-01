@@ -36,7 +36,11 @@ Here is an example assuming that you are using the `app_id/app_key` authenticati
 ```javascript
 var Client = require('3scale').Client;
 
+// Creates a Client with default host and port.This will comunicate with the 3scale platform SaaS default server.
 client = new Client("your provider key");
+
+// When connecting to an on-premise instance of the 3scale platform, create a Client with a given host and port:
+//client = new Client("your provider key", "backend.example.com", 80);
 
 client.authrep({ "service_id": "your service id", "app_id": "your application id", "app_key": "your application key", "usage": { "hits": 1 } }, function(response){
   console.log(response);
@@ -48,7 +52,11 @@ In case you have your API authentication configured in 3scale to use the `user_k
 ```javascript
 var Client = require('3scale').Client;
 
+// Creates a Client with default host and port. This will comunicate with the 3scale platform SaaS default server.
 client = new Client("your provider key");
+
+// When connecting to an on-premise instance of the 3scale platform, create a Client with a given host and port:
+//client = new Client("your provider key", "backend.example.com", 80);
 
 client.authrep_with_user_key({ "service_id": "your service id", "user_key": "your key", "usage": { "hits": 1 } }, function(response){
   console.log(response);
@@ -63,7 +71,11 @@ Note that the **report** method supports sending the usage for multiple transact
 ```javascript
 var Client = require('3scale').Client;
 
+// Creates a Client with default host and port. This will comunicate with the 3scale platform SaaS default server.
 client = new Client("your provider key");
+
+// When connecting to an on-premise instance of the 3scale platform, create a Client with a given host and port:
+//client = new Client("your provider key", "backend.example.com", 80);
 
 client.authorize({ "service_id": "your service id", "app_id": "your application id", "app_key": "your application key" }, function(response){
   if (response.is_success()) {
@@ -83,7 +95,11 @@ Here is the same example for the `user_key` authentication pattern:
 ```javascript
 var Client = require('3scale').Client;
 
+// Creates a Client with default host and port. This will comunicate with the 3scale platform SaaS default server.
 client = new Client("your provider key");
+
+// When connecting to an on-premise instance of the 3scale platform, create a Client with a given host and port:
+//client = new Client("your provider key", "backend.example.com", 80);
 
 client.authorize_with_user_key({ "service_id": "your service id", "user_key": "your key" }, function(response){
   if (response.is_success()) {
@@ -118,7 +134,11 @@ If you set OAuth as the authentication pattern for your API in 3scale, you will 
 ```javascript
 var Client = require('3scale').Client;
 
+// Creates a Client with default host and port. This will comunicate with the 3scale platform SaaS default server.
 client = new Client("your provider key");
+
+// When connecting to an on-premise instance of the 3scale platform, create a Client with a given host and port:
+//client = new Client("your provider key", "backend.example.com", 80);
 
 client.oauth_authorize({ "service_id": "your service id", "app_id": "your application id" }, function(response){
   if (response.is_success()) {
