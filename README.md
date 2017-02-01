@@ -26,6 +26,8 @@ This plugin supports the 3 main calls to the 3scale backend:
 
 ## Usage
 
+> NOTE: From November 2016 `service_id` is mandatory.
+
 ### Authrep
 
 Authrep is a 'one-shot' operation to authorize an application and report the associated transaction at the same time. The main difference between this call and the regular **authorize** call is that usage will be reported if the authorization is successful. Read more about authrep at the active docs page on the [3scale's support site](https://support.3scale.net/reference/active-docs).
@@ -36,7 +38,7 @@ var Client = require('3scale').Client;
 
 client = new Client("your provider key");
 
-client.authrep({"app_id": "your application id", "app_key": "your application key", "usage": { "hits": 1 } }, function(response){
+client.authrep({ "service_id": "your service id", "app_id": "your application id", "app_key": "your application key", "usage": { "hits": 1 } }, function(response){
   console.log(response);
 });
 ```
@@ -48,7 +50,7 @@ var Client = require('3scale').Client;
 
 client = new Client("your provider key");
 
-client.authrep_with_user_key({ "user_key": "your key", "usage": { "hits": 1 } }, function(response){
+client.authrep_with_user_key({ "service_id": "your service id", "user_key": "your key", "usage": { "hits": 1 } }, function(response){
   console.log(response);
 });
 ```
@@ -63,10 +65,10 @@ var Client = require('3scale').Client;
 
 client = new Client("your provider key");
 
-client.authorize({ "app_id": "your application id", "app_key": "your application key" }, function(response){
+client.authorize({ "service_id": "your service id", "app_id": "your application id", "app_key": "your application key" }, function(response){
   if (response.is_success()) {
     var trans = [{ "app_id": "your application id", "usage": { "hits": 3 } }];
-    client.report(trans, function (response) {
+    client.report("your service id", trans, function (response) {
       console.log(response);
     });
   } 
@@ -83,10 +85,10 @@ var Client = require('3scale').Client;
 
 client = new Client("your provider key");
 
-client.authorize_with_user_key({ "user_key": "your key" }, function(response){
+client.authorize_with_user_key({ "service_id": "your service id", "user_key": "your key" }, function(response){
   if (response.is_success()) {
-    var trans = [{ "user_key": "your key", "usage": { "hits": 3 }}];
-    client.report(trans, function (response) {
+    var trans = [{ "user_key": "your key", "usage": { "hits": 3 } }];
+    client.report("your service id", trans, function (response) {
       console.log(response);
     });
   } 
@@ -100,11 +102,11 @@ Note that the **report** method supports sending the usage for multiple transact
 
 ```javascript
 var trans = [
-              { "app_id": "your application id", "usage": {"hits": 1}},
-              { "app_id": "your application id", "usage": {"hits": 1000}}
+              { "app_id": "your application id", "usage": {"hits": 1} },
+              { "app_id": "your application id", "usage": {"hits": 1000} }
              ]
 
-client.report(trans, function(response){
+client.report("your service id", trans, function(response){
   console.log(response);
 });
 ```
@@ -118,10 +120,10 @@ var Client = require('3scale').Client;
 
 client = new Client("your provider key");
 
-client.oauth_authorize({"app_id": "your application id"}, function(response){
+client.oauth_authorize({ "service_id": "your service id", "app_id": "your application id" }, function(response){
   if (response.is_success()) {
-    var trans = [{"app_id": "your application id", "usage": {"hits": 3}}];
-    client.report(trans, function (response) {
+    var trans = [{ "app_id": "your application id", "usage": {"hits": 3} }];
+    client.report("your service id", trans, function (response) {
       console.log(response);
     });
   } 
