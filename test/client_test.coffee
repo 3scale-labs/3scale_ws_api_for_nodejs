@@ -5,7 +5,7 @@ trans = [
   { 'app_id': 'foo', 'usage': { 'hits': 1 } },
   { 'app_id': 'foo', 'usage': { 'hits': 1000 } }
 ]
-report_test = {transactions: trans, provider_key: '1234abcd'}
+report_test = {service_id: '1234567890987', transactions: trans, provider_key: '1234abcd'}
 
 Client = require('../src/client')
 
@@ -67,11 +67,11 @@ describe 'Basic test for the 3Scale::Client', ->
     it 'should call the callback with a successful response', (done) ->
       nock('https://su1.3scale.net')
         .get('/transactions/authorize.xml')
-        .query({ app_key: 'bar', app_id: 'foo', provider_key: '1234abcd' })
+        .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'foo', provider_key: '1234abcd' })
         .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
 
       client = new Client '1234abcd'
-      client.authorize {app_key: 'bar', app_id: 'foo'}, (response) ->
+      client.authorize {service_id: '1234567890987', app_key: 'bar', app_id: 'foo'}, (response) ->
         assert response.is_success()
         assert.equal response.status_code, 200
         done()
@@ -79,11 +79,11 @@ describe 'Basic test for the 3Scale::Client', ->
     it 'should call the callback with a error response if app_id was wrong', (done) ->
       nock('https://su1.3scale.net')
         .get('/transactions/authorize.xml')
-        .query({ app_key: 'bar', app_id: 'ERROR', provider_key: '1234abcd' })
+        .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'ERROR', provider_key: '1234abcd' })
         .reply(403, '<error code="application_not_found">application with id="ERROR" was not found</error>')
 
       client = new Client '1234abcd'
-      client.authorize {app_key: 'bar', app_id: 'ERROR'}, (response) ->
+      client.authorize {service_id: '1234567890987', app_key: 'bar', app_id: 'ERROR'}, (response) ->
         assert.equal response.is_success(), false
         assert.equal response.status_code, 403
         done()
@@ -113,11 +113,11 @@ describe 'Basic test for the 3Scale::Client', ->
           'X-3scale-User-Agent': 'plugin-node-v' + require('../package.json').version
 
       match = nock('https://su1.3scale.net', opts)
-        .get('/transactions/authorize.xml?app_id=foo&provider_key=1234abcd')
+        .get('/transactions/authorize.xml?service_id=1234567890987&app_id=foo&provider_key=1234abcd')
         .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
 
       client = new Client '1234abcd'
-      client.authorize { app_id: 'foo' }, (response) ->
+      client.authorize { service_id: '1234567890987', app_id: 'foo' }, (response) ->
         assert match.isDone()
         done()
 

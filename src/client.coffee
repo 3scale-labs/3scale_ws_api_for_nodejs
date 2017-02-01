@@ -38,14 +38,15 @@ module.exports = class Client
     Parameters:
       options is a Hash object with the following fields
         app_id Required
-        app_key Required
+        service_id Required (from November 2016)
+        app_key Optional 
         referrer Optional
         usage Optional
       callback {Function} Is the callback function that receives the Response object which includes `is_success`
               method to determine the status of the response
 
     Example:
-      client.authorize {app_id: '75165984', app_key: '3e05c797ef193fee452b1ddf19defa74'}, (response) ->
+      client.authorize {service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -56,7 +57,7 @@ module.exports = class Client
     _self = this
     result = null
 
-    if (typeof options isnt 'object') || (options.app_id is undefined)
+    if (typeof options isnt 'object') || (options.app_id is undefined) 
       throw "missing app_id"
 
     url = "/transactions/authorize.xml?"
@@ -90,12 +91,12 @@ module.exports = class Client
     Parameters:
       options is a Hash object with the following fields
         app_id Required
-        service_id Optional (In case of mmultiple services)
+        service_id Required (from November 2016)
       callback {Function} Is the callback function that receives the Response object which includes `is_success`
               method to determine the status of the response
 
     Example:
-      client.oauth_authorize {app_id: '75165984', (response) ->
+      client.oauth_authorize {service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -138,12 +139,12 @@ module.exports = class Client
     Parameters:
       options is a Hash object with the following fields
         user_key Required
-        service_id Optional (In case of mmultiple services)
+        service_id Required (from November 2016)
       callback {Function} Is the callback function that receives the Response object which includes `is_success`
               method to determine the status of the response
 
     Example:
-      client.authorize_with_user_key {user_key: '123456', (response) ->
+      client.authorize_with_user_key {service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -186,12 +187,13 @@ module.exports = class Client
     Authorize and Report in single call
       options is a Hash object with the following fields
         app_id Required
-        app_key, user_id, object, usage, no-body, service_id Optional
+        service_id Required (from November 2016)
+        app_key, user_id, object, usage, no-body
       callback {Function} Is the callback function that receives the Response object which includes `is_success`
               method to determine the status of the response
 
     Example:
-      client.authrep {app_id: '75165984', (response) ->
+      client.authrep {service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -232,7 +234,18 @@ module.exports = class Client
 
   ###
     Authorize and Report with :user_key
+      options is a Hash object with the following fields
+        user_key Required
+        service_id Required (from November 2016)
+      callback {Function} Is the callback function that receives the Response object which includes `is_success`
+              method to determine the status of the response
 
+    Example:
+      client.authrep_with_user_key {service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
   authrep_with_user_key: (options, callback) ->
     _self = this
@@ -269,7 +282,7 @@ module.exports = class Client
     Report transaction(s).
 
     Parameters:
-      service_id {String} Optional (required only if you have more than one service)
+      service_id {String} Required (from November 2016)
       trans {Array} each array element contain information of a transaction. That information is in a Hash in the form
       {
         app_id {String} Required
@@ -284,7 +297,7 @@ module.exports = class Client
         { "app_id": "abc123", "usage": {"hits": 1000}}
       ]
 
-      client.report trans, (response) ->
+      client.report "your service id", trans, (response) ->
         if response.is_success
           # All Ok
         else
