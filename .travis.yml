@@ -2,20 +2,22 @@ language: node_js
 sudo: false
 cache: npm
 node_js:
-- "0.10"
-- "0.12"
-- "4"
+- '0.10'
+- '0.12'
+- '4'
 before_install:
-  - npm install -g npm@2
+- npm install -g npm@2
 env:
   global:
-    - CXX=g++-4.8
-    - TEST_3SCALE_APP_ID=4d4b20b9
-    - TEST_3SCALE_APP_KEY=ecce202ecc2eb8dc7a499c34a34d5987
-    - secure: B/3oWYZZttrXVM5IFn2evSuWMOQqEOOMol3nEQ2vEDGQ6rdGjpYLFDO/qMDPA8Af6Vt72lOFKkgzivuBp8nSd4S1YRTazilMle4zCJiJxzPs69kRDVXf/Mn8Qr/YrmgVzhblvdNqbKxTGrYyvDziPkliQKtIhqyILm3d6+CqmYw=
+  - CXX=g++-4.8
+  - TEST_3SCALE_APP_ID=4d4b20b9
+  - TEST_3SCALE_APP_KEY=ecce202ecc2eb8dc7a499c34a34d5987
+  - secure: B/3oWYZZttrXVM5IFn2evSuWMOQqEOOMol3nEQ2vEDGQ6rdGjpYLFDO/qMDPA8Af6Vt72lOFKkgzivuBp8nSd4S1YRTazilMle4zCJiJxzPs69kRDVXf/Mn8Qr/YrmgVzhblvdNqbKxTGrYyvDziPkliQKtIhqyILm3d6+CqmYw=
+  - secure: gvoSRZEpQaq/8MhuK/pMevm9mMXsaPoX5OkUA475lSsuAUIla6zbfGynM+a4aibPXsQkIxUG1pfwk3K1JjvsYaAfHLIQreX37mWicXRhY9BItZMzTD8AxW70/z03Y3ifIkTZdkEzKzZ9hLiJ4X2WYJvSJr72fWAjtvOJOKk+0+A=
+ 
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
+    - g++-4.8
