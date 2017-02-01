@@ -20,17 +20,23 @@ parser = new xml2js.Parser
     default_host {String} Optional
   Example:
     Client = require('3scale').Client
-    client = new Client(provider_key, [default_host])
+    client = new Client(provider_key, [default_host], [default_port])
 ###
+
 
 module.exports = class Client
   DEFAULT_HEADERS: { "X-3scale-User-Agent": "plugin-node-v#{VERSION}" }
 
-  constructor: (provider_key, default_host = "su1.3scale.net") ->
+  constructor: (provider_key, host, port) ->
+    chosenHost = host || "su1.3scale.net";
+    chosenPort = port || 443;
+    
     unless provider_key?
       throw new Error("missing provider_key")
+   
     @provider_key = provider_key
-    @host = default_host
+    @host = chosenHost
+    @port = chosenPort
 
   ###
     Authorize a application
@@ -66,7 +72,7 @@ module.exports = class Client
 
     req_opts =
       host:   @host
-      port:   443
+      port:   @port
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
@@ -114,7 +120,7 @@ module.exports = class Client
 
     req_opts =
       host:   @host
-      port:   443
+      port:   @port
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
@@ -163,7 +169,7 @@ module.exports = class Client
 
     req_opts =
       host:   @host
-      port:   443
+      port:   @port
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
@@ -212,7 +218,7 @@ module.exports = class Client
 
     req_opts =
       host:   @host
-      port:   443
+      port:   @port
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
@@ -258,7 +264,7 @@ module.exports = class Client
 
     req_opts =
       host:   @host
-      port:   443
+      port:   @port
       path:   url + query
       method: 'GET'
       headers: @DEFAULT_HEADERS
@@ -323,7 +329,7 @@ module.exports = class Client
 
     req_opts =
       host:    @host
-      port:    443
+      port:    @port
       path:    url
       method:  'POST'
       headers:

@@ -15,13 +15,21 @@ describe 'Basic test for the 3Scale::Client', ->
       call = -> new Client()
       assert.throws call, 'missing provider_key'
 
-    it 'should have an default host', ->
+    it 'should have a default host', ->
       client = new Client(123)
       assert.equal client.host, 'su1.3scale.net'
 
     it 'can change the default host', ->
       client = new Client(123, 'example.com')
       assert.equal client.host, 'example.com'
+
+    it 'should have a default port', ->
+      client = new Client(123, 'example.com')
+      assert.equal client.port, 443
+
+    it 'can change the default port', ->
+      client = new Client(123, 'example.com', 3000)
+      assert.equal client.port, 3000
 
     it 'should have an authorize method', ->
       client = new Client('1234abcd')
