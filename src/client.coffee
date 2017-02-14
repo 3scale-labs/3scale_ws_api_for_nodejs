@@ -16,9 +16,9 @@ parser = new xml2js.Parser
 ###
   3Scale client API
   Parameter: 
-    provider_key {String} and service_token {String}: at least one of them is Required. 
+    provider_key {String} and service_token {String}: at least one of them is Required. On prem-instance use service_token (provider_key is deprecated, but the code will allow to use provider_key to avoid a breaking change). 
     default_host {String} Optional
-    default_port {String} Optional
+    default_port {number} Optional
   Example:
     Client = require('3scale').Client
     client = new Client(provider_key, options)
@@ -32,13 +32,13 @@ module.exports = class Client
 
 
   constructor: (provider_key, options) ->
-    @provider_key = provider_key || null
+    @provider_key = provider_key
     @options = options || {}
-    @service_token = options.service_token || null
+    @service_token = options.service_token
     @host = options.host || "su1.3scale.net"
     @port = options.port || 443
 
-    unless provider_key? and @service_token?
+    unless @provider_key? and @service_token?
       throw new Error("missing provider_key or service_token")
 
 
@@ -73,7 +73,7 @@ module.exports = class Client
     url = "/transactions/authorize.xml?"
     query = querystring.stringify options
 
-    if @provider_key and @service_token or @provider_key=null
+    if @service_token
       query += '&' + querystring.stringify {service_token: @service_token} 
     else
       query += '&' + querystring.stringify {provider_key: @provider_key} 
@@ -125,7 +125,7 @@ module.exports = class Client
     url = "/transactions/oauth_authorize.xml?"
     query = querystring.stringify options
 
-    if @provider_key and @service_token or @provider_key=null
+    if @service_token 
       query += '&' + querystring.stringify {service_token: @service_token} 
     else
       query += '&' + querystring.stringify {provider_key: @provider_key} 
@@ -178,7 +178,7 @@ module.exports = class Client
     url = "/transactions/authorize.xml?"
     query = querystring.stringify options
 
-    if @provider_key and @service_token or @provider_key=null
+    if @service_token
       query += '&' + querystring.stringify {service_token: @service_token} 
     else
       query += '&' + querystring.stringify {provider_key: @provider_key} 
@@ -231,7 +231,7 @@ module.exports = class Client
     url = "/transactions/authrep.xml?"
     query = querystring.stringify options
 
-    if @provider_key and @service_token or @provider_key=null
+    if @service_token
       query += '&' + querystring.stringify {service_token: @service_token} 
     else
       query += '&' + querystring.stringify {provider_key: @provider_key} 
@@ -282,7 +282,7 @@ module.exports = class Client
     url = "/transactions/authrep.xml?"
     query = querystring.stringify options
 
-    if @provider_key and @service_token or @provider_key=null
+    if @service_token
       query += '&' + querystring.stringify {service_token: @service_token} 
     else
       query += '&' + querystring.stringify {provider_key: @provider_key} 
@@ -350,7 +350,7 @@ module.exports = class Client
 
     url = "/transactions.xml"
 
-    if @provider_key and @service_token or @provider_key=null
+    if @service_token
       params = {transactions: trans, service_token: @service_token} 
     else
       params = {transactions: trans, provider_key: @provider_key}
