@@ -33,14 +33,12 @@ module.exports = class Client
 
   constructor: (provider_key, options) ->
     @provider_key = provider_key
-    @options = options || {}
-    @service_token = options.service_token
-    @host = options.host || "su1.3scale.net"
-    @port = options.port || 443
+    opts = options || {}
+    @service_token = opts.service_token || null
+    @host = opts.host || "su1.3scale.net"
+    @port = opts.port || 443
 
-    unless @provider_key? and @service_token?
-      throw new Error("missing provider_key or service_token")
-
+    throw new Error("missing provider_key or service_token") if !@service_token? and !@provider_key?
 
   ###
     Authorize a application
@@ -63,6 +61,7 @@ module.exports = class Client
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
   ###
+
   authorize: (options, callback) ->
     _self = this
     result = null
