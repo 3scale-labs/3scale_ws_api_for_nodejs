@@ -11,7 +11,7 @@ Client = require('../src/client')
 
 describe 'Basic test for the 3Scale::Client', ->
   describe 'A client', ->
-    it 'should throw an exception if init without provider_key or service_token', ->
+    it 'should throw an exception if init with neither provider_key nor service_token', ->
       call = -> new Client()
       assert.throws call, 'missing provider_key or service_token'
 
