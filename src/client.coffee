@@ -15,28 +15,32 @@ parser = new xml2js.Parser
 
 ###
   3Scale client API
-  Parameter:
-    provider_key {String} Required
+  Parameter: 
+    provider_key {String} and service_token {String}: at least one of them is Required. 
     default_host {String} Optional
+    default_port {String} Optional
   Example:
     Client = require('3scale').Client
-    client = new Client(provider_key, [default_host], [default_port])
+    client = new Client(provider_key, options)
+    or
+    client = new Client(null, options)
 ###
 
 
 module.exports = class Client
   DEFAULT_HEADERS: { "X-3scale-User-Agent": "plugin-node-v#{VERSION}" }
 
-  constructor: (provider_key, host, port) ->
-    chosenHost = host || "su1.3scale.net";
-    chosenPort = port || 443;
-    
-    unless provider_key?
-      throw new Error("missing provider_key")
-   
-    @provider_key = provider_key
-    @host = chosenHost
-    @port = chosenPort
+
+  constructor: (provider_key, options) ->
+    @provider_key = provider_key || null
+    @options = options || {}
+    @service_token = options.service_token || null
+    @host = options.host || "su1.3scale.net"
+    @port = options.port || 443
+
+    unless provider_key? and @service_token?
+      throw new Error("missing provider_key or service_token")
+
 
   ###
     Authorize a application
@@ -68,7 +72,11 @@ module.exports = class Client
 
     url = "/transactions/authorize.xml?"
     query = querystring.stringify options
-    query += '&' + querystring.stringify {provider_key: @provider_key}
+
+    if @provider_key and @service_token or @provider_key=null
+      query += '&' + querystring.stringify {service_token: @service_token} 
+    else
+      query += '&' + querystring.stringify {provider_key: @provider_key} 
 
     req_opts =
       host:   @host
@@ -116,7 +124,11 @@ module.exports = class Client
 
     url = "/transactions/oauth_authorize.xml?"
     query = querystring.stringify options
-    query += '&' + querystring.stringify {provider_key: @provider_key}
+
+    if @provider_key and @service_token or @provider_key=null
+      query += '&' + querystring.stringify {service_token: @service_token} 
+    else
+      query += '&' + querystring.stringify {provider_key: @provider_key} 
 
     req_opts =
       host:   @host
@@ -165,7 +177,11 @@ module.exports = class Client
 
     url = "/transactions/authorize.xml?"
     query = querystring.stringify options
-    query += '&' + querystring.stringify {provider_key: @provider_key}
+
+    if @provider_key and @service_token or @provider_key=null
+      query += '&' + querystring.stringify {service_token: @service_token} 
+    else
+      query += '&' + querystring.stringify {provider_key: @provider_key} 
 
     req_opts =
       host:   @host
@@ -214,7 +230,12 @@ module.exports = class Client
 
     url = "/transactions/authrep.xml?"
     query = querystring.stringify options
-    query += '&' + querystring.stringify {provider_key: @provider_key}
+
+    if @provider_key and @service_token or @provider_key=null
+      query += '&' + querystring.stringify {service_token: @service_token} 
+    else
+      query += '&' + querystring.stringify {provider_key: @provider_key} 
+
 
     req_opts =
       host:   @host
@@ -260,7 +281,12 @@ module.exports = class Client
 
     url = "/transactions/authrep.xml?"
     query = querystring.stringify options
-    query += '&' + querystring.stringify {provider_key: @provider_key}
+
+    if @provider_key and @service_token or @provider_key=null
+      query += '&' + querystring.stringify {service_token: @service_token} 
+    else
+      query += '&' + querystring.stringify {provider_key: @provider_key} 
+
 
     req_opts =
       host:   @host
@@ -323,7 +349,12 @@ module.exports = class Client
       throw new Error("no transactions to report")
 
     url = "/transactions.xml"
-    params = {transactions: trans, provider_key: @provider_key}
+
+    if @provider_key and @service_token or @provider_key=null
+      params = {transactions: trans, service_token: @service_token} 
+    else
+      params = {transactions: trans, provider_key: @provider_key}
+    
     params.service_id = service_id if service_id
     query = querystring.stringify(params).replace(/\[/g, "%5B").replace(/\]/g, "%5D")
 
