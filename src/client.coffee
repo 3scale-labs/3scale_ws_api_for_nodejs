@@ -33,23 +33,25 @@ module.exports = class Client
 
 
   constructor: (provider_key, options) ->
-    @provider_key = provider_key
-    opts = options || {}
-    @service_token = opts.service_token || false
-    @host = opts.host || "su1.3scale.net"
-    @port = opts.port || 443
+    if typeof provider_key is 'object' and options is undefined
+      opts = provider_key
+    else
+      @provider_key = provider_key
+      opts = options
 
-    throw new Error("missing provider_key or service_token") if @service_token is false and !@provider_key?
+    @service_token = opts?.service_token
+    @host = opts?.host ? 'su1.3scale.net'
+    @port = opts?.port ? 443
 
-
-
+    unless (@service_token? or @provider_key?)
+      throw 'No provider key or service token provided'
 
   ###
     Authorize an Application
     ------------------------
 
     Parameters:
-    A) if you use provider_key parameter to ceate the instance:
+    A) if you used a provider_key to create the Client instance:
       options is a Hash object with the following fields
         app_id Required
         service_id Required (from November 2016)
@@ -58,7 +60,7 @@ module.exports = class Client
         usage Optional
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    B) if you specify service_token: true to ceate the instance:
+    B) if you used {service_token: true} to ceate the Client instance:
       options is a Hash object with the following fields
         service_token Required
         app_id Required
@@ -93,7 +95,7 @@ module.exports = class Client
 
     url = "/transactions/authorize.xml?"
 
-    if @service_token==true
+    if @service_token
       query = querystring.stringify options
     else
       replacer = (key, value) ->
@@ -170,10 +172,16 @@ module.exports = class Client
 
     url = "/transactions/oauth_authorize.xml?"
 
-    query = querystring.stringify options
-
-    unless @service_token is true
-      query += '&' + querystring.stringify {provider_key: @provider_key}
+    if @service_token is true
+      query = querystring.stringify options
+    else
+      replacer = (key, value) ->
+        if key == 'service_token'
+          undefined
+        else
+          value
+      query = querystring.stringify options, replacer   
+      query += '&' + querystring.stringify {provider_key: @provider_key} 
 
     req_opts =
       host:   @host
@@ -241,7 +249,7 @@ module.exports = class Client
 
     url = "/transactions/authorize.xml?"
 
-    if @service_token==true
+    if @service_token is true
       query = querystring.stringify options
     else
       replacer = (key, value) ->
@@ -321,7 +329,7 @@ module.exports = class Client
 
     url = "/transactions/authrep.xml?"
 
-    if @service_token==true
+    if @service_token is true
       query = querystring.stringify options
     else
       replacer = (key, value) ->
@@ -398,7 +406,7 @@ module.exports = class Client
 
     url = "/transactions/authrep.xml?"
 
-    if @service_token==true
+    if @service_token is true
       query = querystring.stringify options
     else
       replacer = (key, value) ->
