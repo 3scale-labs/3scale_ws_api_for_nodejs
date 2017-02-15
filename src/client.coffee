@@ -21,9 +21,10 @@ parser = new xml2js.Parser
     default_port {number} Optional
   Example:
     Client = require('3scale').Client
+
     client = new Client(provider_key, options)
     or
-    client = new Client(null, options)
+    client = new Client(options)
 ###
 
 
@@ -34,33 +35,54 @@ module.exports = class Client
   constructor: (provider_key, options) ->
     @provider_key = provider_key
     opts = options || {}
-    @service_token = opts.service_token || null
+    @service_token = opts.service_token || false
     @host = opts.host || "su1.3scale.net"
     @port = opts.port || 443
 
-    throw new Error("missing provider_key or service_token") if !@service_token? and !@provider_key?
+    throw new Error("missing provider_key or service_token") if @service_token is false and !@provider_key?
+
+
+
 
   ###
-    Authorize a application
+    Authorize an Application
+    ------------------------
 
     Parameters:
+    A) if you use provider_key parameter to ceate the instance:
       options is a Hash object with the following fields
         app_id Required
         service_id Required (from November 2016)
         app_key Optional 
         referrer Optional
         usage Optional
-      callback {Function} Is the callback function that receives the Response object which includes `is_success`
-              method to determine the status of the response
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    Example:
+    B) if you specify service_token: true to ceate the instance:
+      options is a Hash object with the following fields
+        service_token Required
+        app_id Required
+        service_id Required
+        app_key Optional 
+        referrer Optional
+        usage Optional
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
+
+    Example A:
       client.authorize {service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
+    Example B:
+      client.authorize {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
+
 
   authorize: (options, callback) ->
     _self = this
@@ -70,11 +92,16 @@ module.exports = class Client
       throw "missing app_id"
 
     url = "/transactions/authorize.xml?"
-    query = querystring.stringify options
 
-    if @service_token
-      query += '&' + querystring.stringify {service_token: @service_token} 
+    if @service_token==true
+      query = querystring.stringify options
     else
+      replacer = (key, value) ->
+        if key == 'service_token'
+          undefined
+        else
+          value
+      query = querystring.stringify options, replacer   
       query += '&' + querystring.stringify {provider_key: @provider_key} 
 
     req_opts =
@@ -99,35 +126,54 @@ module.exports = class Client
           throw "[Client::authorize] Server Error Code: #{response.statusCode}"
     request.end()
 
+
+
+
   ###
     OAuthorize an Application
+    -------------------------
+
     Parameters:
+    A) if you use provider_key parameter to ceate the instance:
       options is a Hash object with the following fields
         app_id Required
         service_id Required (from November 2016)
-      callback {Function} Is the callback function that receives the Response object which includes `is_success`
-              method to determine the status of the response
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    Example:
+    B) if you specify service_token: true to ceate the instance:
+      options is a Hash object with the following fields
+        service_token Required
+        app_id Required
+        service_id Required
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
+
+    Example A:
       client.oauth_authorize {service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
+    Example B:
+      client.oauth_authorize {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
+
+
   oauth_authorize: (options, callback) ->
     _self = this
     if (typeof options isnt 'object')|| (options.app_id is undefined)
       throw "missing app_id"
 
     url = "/transactions/oauth_authorize.xml?"
+
     query = querystring.stringify options
 
-    if @service_token 
-      query += '&' + querystring.stringify {service_token: @service_token} 
-    else
-      query += '&' + querystring.stringify {provider_key: @provider_key} 
+    unless @service_token is true
+      query += '&' + querystring.stringify {provider_key: @provider_key}
 
     req_opts =
       host:   @host
@@ -151,23 +197,42 @@ module.exports = class Client
           throw "[Client::oauth_authorize] Server Error Code: #{response.statusCode}"
     request.end()
 
+
+
   ###
     Authorize with user_key
+    -----------------------
+
     Parameters:
+    A) if you use provider_key parameter to ceate the instance:
       options is a Hash object with the following fields
         user_key Required
         service_id Required (from November 2016)
-      callback {Function} Is the callback function that receives the Response object which includes `is_success`
-              method to determine the status of the response
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    Example:
+    B) if you specify service_token: true to ceate the instance:
+      options is a Hash object with the following fields
+        service_token Required
+        user_key Required
+        service_id Required
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
+
+    Example A:
       client.authorize_with_user_key {service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
+    Example B:
+      client.authorize_with_user_key {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
+
+
   authorize_with_user_key: (options, callback) ->
     _self = this
 
@@ -175,11 +240,16 @@ module.exports = class Client
       throw "missing user_key"
 
     url = "/transactions/authorize.xml?"
-    query = querystring.stringify options
 
-    if @service_token
-      query += '&' + querystring.stringify {service_token: @service_token} 
+    if @service_token==true
+      query = querystring.stringify options
     else
+      replacer = (key, value) ->
+        if key == 'service_token'
+          undefined
+        else
+          value
+      query = querystring.stringify options, replacer   
       query += '&' + querystring.stringify {provider_key: @provider_key} 
 
     req_opts =
@@ -204,23 +274,45 @@ module.exports = class Client
           throw "[Client::authorize_with_user_key] Server Error Code: #{response.statusCode}"
     request.end()
 
+
+
+
   ###
-    Authorize and Report in single call
+    Authorize and Report in a single call with app_id and app_key
+    -------------------------------------------------------------
+    
+    Parameters:
+    A) if you use provider_key parameter to ceate the instance:
       options is a Hash object with the following fields
         app_id Required
         service_id Required (from November 2016)
         app_key, user_id, object, usage, no-body
-      callback {Function} Is the callback function that receives the Response object which includes `is_success`
-              method to determine the status of the response
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    Example:
+    B) if you specify service_token: true to ceate the instance:
+      options is a Hash object with the following fields
+        service_token Required
+        app_id Required
+        service_id Required (from November 2016)
+        app_key, user_id, object, usage, no-body
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
+
+    Example A:
       client.authrep {service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
+    Example B:
+      client.authrep {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
+
+
   authrep: (options, callback) ->
     _self = this
     if (typeof options isnt 'object') || (options.app_id is undefined)
@@ -228,13 +320,17 @@ module.exports = class Client
     options.usage || options.usage = { hits: 1 }
 
     url = "/transactions/authrep.xml?"
-    query = querystring.stringify options
 
-    if @service_token
-      query += '&' + querystring.stringify {service_token: @service_token} 
+    if @service_token==true
+      query = querystring.stringify options
     else
+      replacer = (key, value) ->
+        if key == 'service_token'
+          undefined
+        else
+          value
+      query = querystring.stringify options, replacer   
       query += '&' + querystring.stringify {provider_key: @provider_key} 
-
 
     req_opts =
       host:   @host
@@ -258,34 +354,60 @@ module.exports = class Client
           throw "[Client::authrep] Server Error Code: #{response.statusCode}"
     request.end()
 
+
+
+
   ###
-    Authorize and Report with :user_key
+    Authorize and Report in a single call with user_key
+    ---------------------------------------------------
+    
+    Parameters:
+    A) if you use provider_key parameter to ceate the instance:
       options is a Hash object with the following fields
         user_key Required
         service_id Required (from November 2016)
-      callback {Function} Is the callback function that receives the Response object which includes `is_success`
-              method to determine the status of the response
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    Example:
+    B) if you specify service_token: true to ceate the instance:
+      options is a Hash object with the following fields
+        service_token Required
+        user_key Required
+        service_id Required (from November 2016)
+      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
+
+    Example A:
       client.authrep_with_user_key {service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
+  
+    Example B:
+      client.authrep_with_user_key {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
+
+
   authrep_with_user_key: (options, callback) ->
     _self = this
     if (typeof options isnt 'object') || (options.user_key is undefined)
       throw "missing user_key"
 
     url = "/transactions/authrep.xml?"
-    query = querystring.stringify options
 
-    if @service_token
-      query += '&' + querystring.stringify {service_token: @service_token} 
+    if @service_token==true
+      query = querystring.stringify options
     else
+      replacer = (key, value) ->
+        if key == 'service_token'
+          undefined
+        else
+          value
+      query = querystring.stringify options, replacer   
       query += '&' + querystring.stringify {provider_key: @provider_key} 
-
 
     req_opts =
       host:   @host
@@ -309,10 +431,13 @@ module.exports = class Client
           throw "[Client::authrep_with_user_key] Server Error Code: #{response.statusCode}"
     request.end()
 
-  ###
-    Report transaction(s).
 
+
+  ###
+    Report transaction(s)
+    ---------------------
     Parameters:
+    A) if you use provider_key parameter to ceate the instance:
       service_id {String} Required (from November 2016)
       trans {Array} each array element contain information of a transaction. That information is in a Hash in the form
       {
@@ -322,10 +447,33 @@ module.exports = class Client
       }
       callback {Function} Function that recive the Response object which include a `is_success` method. Required
 
-    Example:
+    B) if you specify service_token: true to ceate the instance:
+      service_id {String} Required (from November 2016)
+      trans {Array} each array element contain information of a transaction. That information is in a Hash in the form
+      {
+        service_token {String} Required
+        app_id {String} Required
+        usage {Hash} Required
+        timestamp {String} any string parseable by the Data object
+      }
+      callback {Function} Function that recive the Response object which include a `is_success` method. Required
+    
+    Example A:
       trans = [
         { "app_id": "abc123", "usage": {"hits": 1}},
         { "app_id": "abc123", "usage": {"hits": 1000}}
+      ]
+
+      client.report "your service id", trans, (response) ->
+        if response.is_success
+          # All Ok
+        else
+         sys.puts "#{response.error_message} with code: #{response.error_code}"
+
+    Example B:
+      trans = [
+        { "service_token": "1234567891011121314afjwoº8w39475msosirwe832394111188900184756382", "app_id": "abc123", "usage": {"hits": 1}},
+        { "service_token": "1234567891011121314afjwoº8w39475msosirwe832394111188900184756382", "app_id": "abc123", "usage": {"hits": 1000}}
       ]
 
       client.report "your service id", trans, (response) ->
@@ -350,11 +498,12 @@ module.exports = class Client
     url = "/transactions.xml"
 
     if @service_token
-      params = {transactions: trans, service_token: @service_token} 
+      params = {transactions: trans}
     else
       params = {transactions: trans, provider_key: @provider_key}
     
     params.service_id = service_id if service_id
+
     query = querystring.stringify(params).replace(/\[/g, "%5B").replace(/\]/g, "%5D")
 
     req_opts =
