@@ -112,10 +112,10 @@ describe 'Basic test for the 3Scale::Client', ->
       assert.throws (() -> client.authrep_with_user_key({}, ()->)), 'missing user_key'
 
   describe 'The authorize method', ->
-    it 'should call the callback with a successful response with provicer_key', (done) ->
+    it 'should call the callback with a successful response with provider_key', (done) ->
       nock('https://su1.3scale.net')
         .get('/transactions/authorize.xml')
-        .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'foo'})
+        .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'foo', provider_key: '1234abcd'})
         .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
 
       client = new Client '1234abcd'
@@ -130,7 +130,7 @@ describe 'Basic test for the 3Scale::Client', ->
         .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'foo', service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382' })
         .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
 
-      client = new Client {service_token: true}
+      client = new Client null, {service_token: true}
       client.authorize {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', app_key: 'bar', app_id: 'foo'}, (response) ->
         assert response.is_success()
         assert.equal response.status_code, 200
@@ -139,7 +139,7 @@ describe 'Basic test for the 3Scale::Client', ->
     it 'should call the callback with a error response if app_id was wrong', (done) ->
       nock('https://su1.3scale.net')
         .get('/transactions/authorize.xml')
-        .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'ERROR', service_token: '67859fghijk' })
+        .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'ERROR', provider_key: '1234abcd'})
         .reply(403, '<error code="application_not_found">application with id="ERROR" was not found</error>')
 
       client = new Client '1234abcd'
