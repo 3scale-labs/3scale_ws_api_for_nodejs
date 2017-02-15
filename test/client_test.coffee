@@ -2,10 +2,10 @@ assert = require 'assert'
 nock   = require 'nock'
 
 trans = [
-  { 'app_id': 'foo', 'usage': { 'hits': 1 } },
-  { 'app_id': 'foo', 'usage': { 'hits': 1000 } }
+  { 'service_token': '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', 'app_id': 'foo', 'usage': { 'hits': 1 } },
+  { 'service_token': '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', 'app_id': 'foo', 'usage': { 'hits': 1000 } }
 ]
-report_test = {service_id: '1234567890987', transactions: trans, service_token: '67859fghijk'}
+report_test = {service_id: '1234567890987', transactions: trans}
 
 Client = require('../src/client')
 
@@ -16,19 +16,19 @@ describe 'Basic test for the 3Scale::Client', ->
       assert.throws call, 'missing provider_key or service_token'
 
     it 'should have a default host', ->
-      client = new Client(123)
+      client = new Client('123')
       assert.equal client.host,'su1.3scale.net'
 
     it 'can change the default host', ->
-      client = new Client(123, {host: 'example.com'})
+      client = new Client('123', {host: 'example.com'})
       assert.equal client.host, 'example.com'
 
     it 'should have a default port', ->
-      client = new Client(123, {host: 'example.com'})
+      client = new Client('123', {host: 'example.com'})
       assert.equal client.port, 443
 
     it 'can change the default port', ->
-      client = new Client(123, {host: 'example.com', port: 3000})
+      client = new Client('123', {host: 'example.com', port: 3000})
       assert.equal client.port, 3000
 
     it 'should have an authorize method with provider_key', ->
@@ -36,7 +36,23 @@ describe 'Basic test for the 3Scale::Client', ->
       assert.equal typeof client.authorize, 'function'
 
     it 'should have an authorize method with service_token', ->
-      client = new Client('1234abcd', {service_token: '67859fghijk'})
+      client = new Client({service_token: true})
+      assert.equal typeof client.authorize, 'function'
+
+    it 'should have an authorize method with provider key and service_token', ->
+      client = new Client('1234abcd', {service_token: true})
+      assert.equal typeof client.authorize, 'function'
+
+    it 'should have an authorize method with service_token and a given port', ->
+      client = new Client({service_token: true, port: 3000 })
+      assert.equal typeof client.authorize, 'function'
+
+    it 'should have an authorize method with service_token and a given host', ->
+      client = new Client({service_token: true, host: 'example.com' })
+      assert.equal typeof client.authorize, 'function'
+
+    it 'should have an authorize method with service_token, a given host and port', ->
+      client = new Client({service_token: true, host: 'example.com', port: 3000 })
       assert.equal typeof client.authorize, 'function'
 
     it 'should throw an exception if authorize method is called without :app_id', ->
@@ -48,7 +64,11 @@ describe 'Basic test for the 3Scale::Client', ->
       assert.equal typeof client.oauth_authorize, 'function'
 
     it 'should have an oauth_authorize method with service_token', ->
-      client = new Client('1234abcd', {service_token: '67859fghijk'})
+      client = new Client({service_token: true})
+      assert.equal typeof client.oauth_authorize, 'function'
+
+    it 'should have an oauth_authorize method with provider_key and service_token', ->
+      client = new Client('1234abcd', {service_token: true})
       assert.equal typeof client.oauth_authorize, 'function'
 
     it 'should throw an exception if oauth_authorize method is called without :app_id', ->
@@ -92,14 +112,26 @@ describe 'Basic test for the 3Scale::Client', ->
       assert.throws (() -> client.authrep_with_user_key({}, ()->)), 'missing user_key'
 
   describe 'The authorize method', ->
-    it 'should call the callback with a successful response', (done) ->
+    it 'should call the callback with a successful response with provicer_key', (done) ->
       nock('https://su1.3scale.net')
         .get('/transactions/authorize.xml')
-        .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'foo', service_token: '67859fghijk' })
+        .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'foo'})
         .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
 
       client = new Client '1234abcd'
       client.authorize {service_id: '1234567890987', app_key: 'bar', app_id: 'foo'}, (response) ->
+        assert response.is_success()
+        assert.equal response.status_code, 200
+        done()
+
+    it 'should call the callback with a successful response with service_token', (done) ->
+      nock('https://su1.3scale.net')
+        .get('/transactions/authorize.xml')
+        .query({ service_id: '1234567890987', app_key: 'bar', app_id: 'foo', service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382' })
+        .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
+
+      client = new Client {service_token: true}
+      client.authorize {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', app_key: 'bar', app_id: 'foo'}, (response) ->
         assert response.is_success()
         assert.equal response.status_code, 200
         done()
