@@ -19,12 +19,13 @@ parser = new xml2js.Parser
     provider_key {String} and service_token {String}: at least one of them is Required. On prem-instance use service_token (provider_key is deprecated, but the code will allow to use provider_key to avoid a breaking change). 
     default_host {String} Optional
     default_port {number} Optional
+  
   Example:
     Client = require('3scale').Client
-
-    client = new Client(provider_key, options)
-    or
-    client = new Client(options)
+    
+    client = new Client(provider_key, options)    //If you use your provider key
+    or 
+    client = new Client(options)                  //If you use a service token
 ###
 
 
@@ -51,8 +52,8 @@ module.exports = class Client
     ------------------------
 
     Parameters:
-    A) if you used a provider_key to create the Client instance:
       options is a Hash object with the following fields
+        service_token Required if you used {service_token: true} instead of provider_key to ceate the Client instance 
         app_id Required
         service_id Required (from November 2016)
         app_key Optional 
@@ -60,25 +61,15 @@ module.exports = class Client
         usage Optional
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    B) if you used {service_token: true} to ceate the Client instance:
-      options is a Hash object with the following fields
-        service_token Required
-        app_id Required
-        service_id Required
-        app_key Optional 
-        referrer Optional
-        usage Optional
-      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
-
-    Example A:
+    Example using provider_key:
       client.authorize {service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
-    Example B:
-      client.authorize {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
+    Example using service_token:
+      client.authorize {service_token: '12sdtsdr23454sdfsdf', service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -136,28 +127,21 @@ module.exports = class Client
     -------------------------
 
     Parameters:
-    A) if you use provider_key parameter to ceate the instance:
       options is a Hash object with the following fields
+        service_token Required if you used {service_token: true} instead of provider_key to ceate the Client instance 
         app_id Required
         service_id Required (from November 2016)
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    B) if you specify service_token: true to ceate the instance:
-      options is a Hash object with the following fields
-        service_token Required
-        app_id Required
-        service_id Required
-      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
-
-    Example A:
+    Example using provider_key:
       client.oauth_authorize {service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
-    Example B:
-      client.oauth_authorize {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
+    Example using service_token:
+      client.oauth_authorize {service_token: '12sdtsdr23454sdfsdf', service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -212,28 +196,21 @@ module.exports = class Client
     -----------------------
 
     Parameters:
-    A) if you use provider_key parameter to ceate the instance:
       options is a Hash object with the following fields
+        service_token Required if you used {service_token: true} instead of provider_key to ceate the Client instance 
         user_key Required
         service_id Required (from November 2016)
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    B) if you specify service_token: true to ceate the instance:
-      options is a Hash object with the following fields
-        service_token Required
-        user_key Required
-        service_id Required
-      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
-
-    Example A:
+    Example using provider_key:
       client.authorize_with_user_key {service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
-    Example B:
-      client.authorize_with_user_key {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
+    Example using service_token:
+      client.authorize_with_user_key {service_token: '12sdtsdr23454sdfsdf', service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -290,30 +267,22 @@ module.exports = class Client
     -------------------------------------------------------------
     
     Parameters:
-    A) if you use provider_key parameter to ceate the instance:
       options is a Hash object with the following fields
+        service_token Required if you used {service_token: true} instead of provider_key to ceate the Client instance 
         app_id Required
         service_id Required (from November 2016)
         app_key, user_id, object, usage, no-body
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    B) if you specify service_token: true to ceate the instance:
-      options is a Hash object with the following fields
-        service_token Required
-        app_id Required
-        service_id Required (from November 2016)
-        app_key, user_id, object, usage, no-body
-      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
-
-    Example A:
+    Example using provider_key:
       client.authrep {service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
-    Example B:
-      client.authrep {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
+    Example using service_token:
+      client.authrep {service_token: '12sdtsdr23454sdfsdf', service_id: '1234567890987', app_id: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -370,28 +339,21 @@ module.exports = class Client
     ---------------------------------------------------
     
     Parameters:
-    A) if you use provider_key parameter to ceate the instance:
-      options is a Hash object with the following fields
-        user_key Required
-        service_id Required (from November 2016)
-      callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
-
-    B) if you specify service_token: true to ceate the instance:
       options is a Hash object with the following fields
         service_token Required
         user_key Required
         service_id Required (from November 2016)
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
-    Example A:
+    Example using provider_key:
       client.authrep_with_user_key {service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
   
-    Example B:
-      client.authrep_with_user_key {service_token: '1234567891011121314afjwoº8w39475msosirwe832394111188900184756382', service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
+    Example using service_token:
+      client.authrep_with_user_key {service_token: '12sdtsdr23454sdfsdf', service_id: '1234567890987', user_key: 'ca5c5a49'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -445,28 +407,26 @@ module.exports = class Client
     Report transaction(s)
     ---------------------
     Parameters:
-    A) if you use provider_key parameter to ceate the instance:
       service_id {String} Required (from November 2016)
-      trans {Array} each array element contain information of a transaction. That information is in a Hash in the form
-      {
-        app_id {String} Required
-        usage {Hash} Required
-        timestamp {String} any string parseable by the Data object
-      }
+      trans {Array} Each array element contain information of a transaction. That information is in a Hash in the form
+        A) if you used provider_key to ceate the Client instance 
+        {
+          app_id {String} Required
+          usage {Hash} Required
+          timestamp {String} any string parseable by the Data object
+        }
+        B) if you used {service_token: true} instead of provider_key to ceate the Client instance 
+        {
+          service_token {String} Required
+          app_id {String} Required
+          usage {Hash} Required
+          timestamp {String} any string parseable by the Data object
+        }
+
       callback {Function} Function that recive the Response object which include a `is_success` method. Required
 
-    B) if you specify service_token: true to ceate the instance:
-      service_id {String} Required (from November 2016)
-      trans {Array} each array element contain information of a transaction. That information is in a Hash in the form
-      {
-        service_token {String} Required
-        app_id {String} Required
-        usage {Hash} Required
-        timestamp {String} any string parseable by the Data object
-      }
-      callback {Function} Function that recive the Response object which include a `is_success` method. Required
     
-    Example A:
+    Example using provider_key:
       trans = [
         { "app_id": "abc123", "usage": {"hits": 1}},
         { "app_id": "abc123", "usage": {"hits": 1000}}
@@ -478,10 +438,10 @@ module.exports = class Client
         else
          sys.puts "#{response.error_message} with code: #{response.error_code}"
 
-    Example B:
+    Example using service_token:
       trans = [
-        { "service_token": "1234567891011121314afjwoº8w39475msosirwe832394111188900184756382", "app_id": "abc123", "usage": {"hits": 1}},
-        { "service_token": "1234567891011121314afjwoº8w39475msosirwe832394111188900184756382", "app_id": "abc123", "usage": {"hits": 1000}}
+        { "service_token": "12sdtsdr23454sdfsdf", "app_id": "abc123", "usage": {"hits": 1}},
+        { "service_token": "12sdtsdr23454sdfsdf", "app_id": "abc123", "usage": {"hits": 1000}}
       ]
 
       client.report "your service id", trans, (response) ->
