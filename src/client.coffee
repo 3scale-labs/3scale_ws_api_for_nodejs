@@ -16,7 +16,7 @@ parser = new xml2js.Parser
 ###
   3Scale client API
   Parameter: 
-    provider_key {String} and service_token {String}: at least one of them is Required. On prem-instance use service_token (provider_key is deprecated, but the code will allow to use provider_key to avoid a breaking change). 
+    provider_key {String} and service_token {boolean}: at least one of them is Required. On prem-instance use service_token (provider_key is deprecated, but the code will allow to use provider_key to avoid a breaking change). 
     default_host {String} Optional
     default_port {number} Optional
   
@@ -40,12 +40,13 @@ module.exports = class Client
       @provider_key = provider_key
       opts = options
 
-    @service_token = opts?.service_token
     @host = opts?.host ? 'su1.3scale.net'
     @port = opts?.port ? 443
 
-    unless (@service_token? or @provider_key?)
+  ###
+    unless (service_token? or provider_key?)
       throw 'No provider key or service token provided'
+  ###
 
   ###
     Authorize an Application
@@ -76,50 +77,16 @@ module.exports = class Client
          sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
 
-
   authorize: (options, callback) ->
-    _self = this
     result = null
 
-    if (typeof options isnt 'object') || (options.app_id is undefined) 
-      throw "missing app_id"
+    this._verify_app_id_exists options 
 
-    url = "/transactions/authorize.xml?"
+    query = this._build_query_string @provider_key, options
+    req_opts = this._prepare_request "/transactions/authorize.xml", query
 
-    if @service_token
-      query = querystring.stringify options
-    else
-      replacer = (key, value) ->
-        if key == 'service_token'
-          undefined
-        else
-          value
-      query = querystring.stringify options, replacer   
-      query += '&' + querystring.stringify {provider_key: @provider_key} 
-
-    req_opts =
-      host:   @host
-      port:   @port
-      path:   url + query
-      method: 'GET'
-      headers: @DEFAULT_HEADERS
-
-    request = https.request req_opts, (response) ->
-      response.setEncoding 'utf8'
-      xml = ""
-      response.on 'data', (chunk) ->
-        xml += chunk
-
-      response.on 'end', ->
-        if response.statusCode == 200 || response.statusCode == 409
-          _self._build_success_authorize_response(response.statusCode, xml, callback)
-        else if response.statusCode in [400...409]
-          _self._build_error_response(response.statusCode, xml, callback)
-        else
-          throw "[Client::authorize] Server Error Code: #{response.statusCode}"
-    request.end()
-
-
+    this._do_request_response req_opts, callback, "Client::authorize"
+    
 
 
   ###
@@ -150,45 +117,12 @@ module.exports = class Client
 
 
   oauth_authorize: (options, callback) ->
-    _self = this
-    if (typeof options isnt 'object')|| (options.app_id is undefined)
-      throw "missing app_id"
+    this._verify_app_id_exists options
 
-    url = "/transactions/oauth_authorize.xml?"
+    query = this._build_query_string @provider_key, options
+    req_opts = this._prepare_request "/transactions/oauth_authorize.xml", query
 
-    if @service_token is true
-      query = querystring.stringify options
-    else
-      replacer = (key, value) ->
-        if key == 'service_token'
-          undefined
-        else
-          value
-      query = querystring.stringify options, replacer   
-      query += '&' + querystring.stringify {provider_key: @provider_key} 
-
-    req_opts =
-      host:   @host
-      port:   @port
-      path:   url + query
-      method: 'GET'
-      headers: @DEFAULT_HEADERS
-
-    request = https.request req_opts, (response) ->
-      response.setEncoding 'utf8'
-      xml = ""
-      response.on 'data', (chunk) ->
-        xml += chunk
-
-      response.on 'end', ->
-        if response.statusCode == 200 || response.statusCode == 409
-          _self._build_success_authorize_response(response.statusCode, xml, callback)
-        else if response.statusCode in [400...409]
-          _self._build_error_response(response.statusCode, xml, callback)
-        else
-          throw "[Client::oauth_authorize] Server Error Code: #{response.statusCode}"
-    request.end()
-
+    this._do_request_response req_opts, callback, "Client::oauth_authorize"
 
 
   ###
@@ -219,47 +153,13 @@ module.exports = class Client
 
 
   authorize_with_user_key: (options, callback) ->
-    _self = this
+    this._verify_user_key_exists options
 
-    if (typeof options isnt 'object') || (options.user_key is undefined)
-      throw "missing user_key"
+    query = this._build_query_string @provider_key, options
+    req_opts = this._prepare_request "/transactions/authorize.xml", query
 
-    url = "/transactions/authorize.xml?"
-
-    if @service_token is true
-      query = querystring.stringify options
-    else
-      replacer = (key, value) ->
-        if key == 'service_token'
-          undefined
-        else
-          value
-      query = querystring.stringify options, replacer   
-      query += '&' + querystring.stringify {provider_key: @provider_key} 
-
-    req_opts =
-      host:   @host
-      port:   @port
-      path:   url + query
-      method: 'GET'
-      headers: @DEFAULT_HEADERS
-
-    request = https.request req_opts, (response) ->
-      response.setEncoding 'utf8'
-      xml = ""
-      response.on 'data', (chunk) ->
-        xml += chunk
-
-      response.on 'end', ->
-        if response.statusCode == 200 || response.statusCode == 409
-          _self._build_success_authorize_response(response.statusCode, xml, callback)
-        else if response.statusCode in [400...409]
-          _self._build_error_response(response.statusCode, xml, callback)
-        else
-          throw "[Client::authorize_with_user_key] Server Error Code: #{response.statusCode}"
-    request.end()
-
-
+    this._do_request_response req_opts, callback, "Client::authorize_with_user_key"
+    
 
 
   ###
@@ -289,48 +189,15 @@ module.exports = class Client
          sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
 
-
   authrep: (options, callback) ->
-    _self = this
-    if (typeof options isnt 'object') || (options.app_id is undefined)
-      throw "missing app_id"
-    options.usage || options.usage = { hits: 1 }
+    this._verify_app_id_exists options
 
-    url = "/transactions/authrep.xml?"
+    this._ensure_hits_exist_in options
 
-    if @service_token is true
-      query = querystring.stringify options
-    else
-      replacer = (key, value) ->
-        if key == 'service_token'
-          undefined
-        else
-          value
-      query = querystring.stringify options, replacer   
-      query += '&' + querystring.stringify {provider_key: @provider_key} 
+    query = this._build_query_string @provider_key, options
+    req_opts = this._prepare_request "/transactions/authrep.xml", query
 
-    req_opts =
-      host:   @host
-      port:   @port
-      path:   url + query
-      method: 'GET'
-      headers: @DEFAULT_HEADERS
-
-    request = https.request req_opts, (response) ->
-      response.setEncoding 'utf8'
-      xml = ""
-      response.on 'data', (chunk) ->
-        xml += chunk
-
-      response.on 'end', ->
-        if response.statusCode == 200 || response.statusCode == 409
-          _self._build_success_authorize_response(response.statusCode, xml, callback)
-        else if response.statusCode in [400...409]
-          _self._build_error_response(response.statusCode, xml, callback)
-        else
-          throw "[Client::authrep] Server Error Code: #{response.statusCode}"
-    request.end()
-
+    this._do_request_response req_opts, callback, "Client::authrep"
 
 
 
@@ -360,47 +227,15 @@ module.exports = class Client
          sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
 
-
   authrep_with_user_key: (options, callback) ->
-    _self = this
-    if (typeof options isnt 'object') || (options.user_key is undefined)
-      throw "missing user_key"
+    this._verify_user_key_exists options
 
-    url = "/transactions/authrep.xml?"
+    this._ensure_hits_exist_in options
 
-    if @service_token is true
-      query = querystring.stringify options
-    else
-      replacer = (key, value) ->
-        if key == 'service_token'
-          undefined
-        else
-          value
-      query = querystring.stringify options, replacer   
-      query += '&' + querystring.stringify {provider_key: @provider_key} 
+    query = this._build_query_string @provider_key, options
+    req_opts = this._prepare_request "/transactions/authrep.xml", query
 
-    req_opts =
-      host:   @host
-      port:   @port
-      path:   url + query
-      method: 'GET'
-      headers: @DEFAULT_HEADERS
-
-    request = https.request req_opts, (response) ->
-      response.setEncoding 'utf8'
-      xml = ""
-      response.on 'data', (chunk) ->
-        xml += chunk
-
-      response.on 'end', ->
-        if response.statusCode == 200 || response.statusCode == 409
-          _self._build_success_authorize_response(response.statusCode, xml, callback)
-        else if response.statusCode in [400...409]
-          _self._build_error_response(response.statusCode, xml, callback)
-        else
-          throw "[Client::authrep_with_user_key] Server Error Code: #{response.statusCode}"
-    request.end()
-
+    this._do_request_response req_opts, callback, "Client::authrep_with_user_key"
 
 
   ###
@@ -465,7 +300,7 @@ module.exports = class Client
 
     url = "/transactions.xml"
 
-    if @service_token
+    if trans.service_token
       params = {transactions: trans}
     else
       params = {transactions: trans, provider_key: @provider_key}
@@ -501,8 +336,81 @@ module.exports = class Client
     request.write query
     request.end()
 
+  ################################################################################################
+  ################################################################################################
+  ################################################################################################
+  ################################################################################################
+  ################################################################################################
+  ################################################################################################
 
   # private methods
+
+  _ensure_hits_exist_in: (options) ->
+    options.usage || options.usage = { hits: 1 }
+
+  _build_query_string: (provider_key, options) ->
+    if options.service_token
+      query = querystring.stringify options
+    else
+      replacer = (key, value) ->
+        if key == 'service_token'
+          undefined
+        else
+          value
+      query = querystring.stringify options, replacer   
+      query += '&' + querystring.stringify {provider_key: provider_key}
+    return query
+
+  _do_request_response: (req_opts, callback, error_message) ->
+    _self = this
+    request = https.request req_opts, (response) ->
+      response.setEncoding 'utf8'
+      xml = ""
+      response.on 'data', (chunk) ->
+        xml += chunk
+
+      response.on 'end', ->
+        if response.statusCode == 200 || response.statusCode == 409
+          _self._build_success_authorize_response response.statusCode, xml, callback
+        else if response.statusCode in [400...409]
+          _self._build_error_response(response.statusCode, xml, callback)
+        else
+          throw "#{error_message} Server Error Code: #{response.statusCode}"
+    request.end()
+
+
+  _prepareRequestObject: (headers, method, host, port, path, query) ->
+    req_opts =
+      host:   host
+      port:   port
+      path:   path + "?" + query
+      method: method
+      headers: headers
+    return req_opts
+
+  ###
+    Convenience method to build the req_opts we'll use throughout the Client class.
+  ###
+  _prepare_request: (path, query) ->
+    return this._prepareRequestObject(@DEFAULT_HEADERS, 'GET', @host, @port, path, query)
+
+  ###
+   Grants options.app_id exists. 
+   If param `options` is not an object or doesn't contain 'app_id' throws error
+  ###
+  _verify_app_id_exists: (options) ->
+    if (typeof options isnt 'object') || (options.app_id is undefined) 
+      throw "missing app_id"
+
+  ###
+   Grants options.user_key exists. 
+   If param `options` is not an object or doesn't contain 'user_key' throws error
+  ###
+  _verify_user_key_exists: (options) ->
+    if (typeof options isnt 'object') || (options.user_key is undefined)
+      throw "missing user_key"
+
+
   _parseXML: (xml) ->
     return new Promise (resolve, reject) ->
       parser.parseString xml, (err, res) ->
