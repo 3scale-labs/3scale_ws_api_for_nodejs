@@ -16,16 +16,17 @@ parser = new xml2js.Parser
 ###
   3Scale client API
   Parameter: 
-    provider_key {String} and service_token {boolean}: at least one of them is Required. On prem-instance use service_token (provider_key is deprecated, but the code will allow to use provider_key to avoid a breaking change). 
-    default_host {String} Optional
-    default_port {number} Optional
+    provider_key {String} Required if you don't use service_token in the method. 
+    Options: 
+      host {String} Optional
+      port {number} Optional
   
   Example:
     Client = require('3scale').Client
     
-    client = new Client(provider_key, options)    //If you use your provider key
+    client = new Client(provider_key, options)    //If you use your provider_key
     or 
-    client = new Client(options)                  //If you use a service token
+    client = new Client(options)                  //If you use a service_token in the method
 ###
 
 
@@ -43,10 +44,8 @@ module.exports = class Client
     @host = opts?.host ? 'su1.3scale.net'
     @port = opts?.port ? 443
 
-  ###
-    unless (service_token? or provider_key?)
-      throw 'No provider key or service token provided'
-  ###
+    console.log 'provider_key is deprecated in favor of service_token with service_id. The release of this client will default to use service_token' if provider_key
+
 
   ###
     Authorize an Application
@@ -54,7 +53,7 @@ module.exports = class Client
 
     Parameters:
       options is a Hash object with the following fields
-        service_token Required if you used {service_token: true} instead of provider_key to ceate the Client instance 
+        service_token Required if you didn't use provider_key to ceate the Client instance 
         app_id Required
         service_id Required (from November 2016)
         app_key Optional 
@@ -95,7 +94,7 @@ module.exports = class Client
 
     Parameters:
       options is a Hash object with the following fields
-        service_token Required if you used {service_token: true} instead of provider_key to ceate the Client instance 
+        service_token Required if you didn't use provider_key to ceate the Client instance 
         app_id Required
         service_id Required (from November 2016)
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
@@ -131,7 +130,7 @@ module.exports = class Client
 
     Parameters:
       options is a Hash object with the following fields
-        service_token Required if you used {service_token: true} instead of provider_key to ceate the Client instance 
+        service_token Required if you didn't use provider_key to ceate the Client instance
         user_key Required
         service_id Required (from November 2016)
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
@@ -168,7 +167,7 @@ module.exports = class Client
     
     Parameters:
       options is a Hash object with the following fields
-        service_token Required if you used {service_token: true} instead of provider_key to ceate the Client instance 
+        service_token Required if you didn't use provider_key to ceate the Client instance
         app_id Required
         service_id Required (from November 2016)
         app_key, user_id, object, usage, no-body
@@ -207,7 +206,7 @@ module.exports = class Client
     
     Parameters:
       options is a Hash object with the following fields
-        service_token Required
+        service_token Required if you didn't use provider_key to ceate the Client instance
         user_key Required
         service_id Required (from November 2016)
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
@@ -250,7 +249,7 @@ module.exports = class Client
           usage {Hash} Required
           timestamp {String} any string parseable by the Data object
         }
-        B) if you used {service_token: true} instead of provider_key to ceate the Client instance 
+        B) if you didn't use provider_key to ceate the Client instance
         {
           service_token {String} Required
           app_id {String} Required
