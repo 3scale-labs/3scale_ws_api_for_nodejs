@@ -39,12 +39,13 @@ module.exports = class Client
       opts = provider_key
     else
       @provider_key = provider_key
+      console?.warn?('provider_key is deprecated in favor of service_token with service_id. The release of this client will default to use service_token')
       opts = options
 
     @host = opts?.host ? 'su1.3scale.net'
     @port = opts?.port ? 443
 
-    console.log 'provider_key is deprecated in favor of service_token with service_id. The release of this client will default to use service_token' if provider_key
+    
 
 
   ###
@@ -81,7 +82,7 @@ module.exports = class Client
 
     this._verify_app_id_exists options 
 
-    query = this._build_query_string @provider_key, options
+    query = this._build_query_string options
     req_opts = this._prepare_request "/transactions/authorize.xml", query
 
     this._do_request_response req_opts, callback, "Client::authorize"
@@ -118,7 +119,7 @@ module.exports = class Client
   oauth_authorize: (options, callback) ->
     this._verify_app_id_exists options
 
-    query = this._build_query_string @provider_key, options
+    query = this._build_query_string options
     req_opts = this._prepare_request "/transactions/oauth_authorize.xml", query
 
     this._do_request_response req_opts, callback, "Client::oauth_authorize"
@@ -154,7 +155,7 @@ module.exports = class Client
   authorize_with_user_key: (options, callback) ->
     this._verify_user_key_exists options
 
-    query = this._build_query_string @provider_key, options
+    query = this._build_query_string options
     req_opts = this._prepare_request "/transactions/authorize.xml", query
 
     this._do_request_response req_opts, callback, "Client::authorize_with_user_key"
@@ -193,7 +194,7 @@ module.exports = class Client
 
     this._ensure_hits_exist_in options
 
-    query = this._build_query_string @provider_key, options
+    query = this._build_query_string options
     req_opts = this._prepare_request "/transactions/authrep.xml", query
 
     this._do_request_response req_opts, callback, "Client::authrep"
@@ -231,7 +232,7 @@ module.exports = class Client
 
     this._ensure_hits_exist_in options
 
-    query = this._build_query_string @provider_key, options
+    query = this._build_query_string options
     req_opts = this._prepare_request "/transactions/authrep.xml", query
 
     this._do_request_response req_opts, callback, "Client::authrep_with_user_key"
@@ -347,7 +348,7 @@ module.exports = class Client
   _ensure_hits_exist_in: (options) ->
     options.usage || options.usage = { hits: 1 }
 
-  _build_query_string: (provider_key, options) ->
+  _build_query_string: (options) ->
     if options.service_token
       query = querystring.stringify options
     else
@@ -357,7 +358,7 @@ module.exports = class Client
         else
           value
       query = querystring.stringify options, replacer   
-      query += '&' + querystring.stringify {provider_key: provider_key}
+      query += '&' + querystring.stringify {provider_key: @provider_key}
     return query
 
   _do_request_response: (req_opts, callback, error_message) ->
