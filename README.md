@@ -16,13 +16,13 @@ Starting at version 0.6.0, this plugin requires using **Node.js versions 0.10.x 
 
 ## Synopsis
 
-This plugin supports the 3 main calls to the 3scale backend:
+This plugin supports the 3 main calls to the 3scale Service Management API:
 
 - authrep grants access to your API and reports the traffic on it in one call.
 - authorize grants access to your API.
 - report reports traffic on your API.
 
-3scale supports 3 authentication modes: App Id, User Key and OAuth. The first two are similar on their calls to the backend, they support authrep. OAuth differs in its usage two calls are required: first authorize then report.
+3scale supports 3 authentication modes: App Id, User Key and OAuth. The first two are similar on their calls to the Service Management API, they support authrep. OAuth differs in its usage two calls are required: first authorize then report.
 
 ## Usage
 
@@ -38,7 +38,7 @@ Here is an example assuming that you are using the `app_id/app_key` authenticati
 var Client = require('3scale').Client;
 
 //Create a Client with a given host and port when connecting to an on-premise instance of the 3scale platform:
-client = new Client({host: "backend.example.com", port: 80});
+client = new Client({host: "service_management_api.example.com", port: 80});
 
 /* or create a Client with default host and port. This will comunicate with the 3scale platform SaaS default server:
 client = new Client();
@@ -51,7 +51,7 @@ client.authrep({ service_token: "your service token", service_id: "your service 
 /* If you don't use service_token in the method, you'll be expected to specify a provider_key parameter in the Client instance, which is deprecated in favor of using service_token in the method.
 
 Create a Client with a given host and port:
-client = new Client("your provider key",{host: "backend.example.com", port: 80});
+client = new Client("your provider key",{host: "service_management_api.example.com", port: 80});
 
 or 
 
@@ -70,7 +70,7 @@ In case you have your API authentication configured in 3scale to use the `user_k
 var Client = require('3scale').Client;
 
 //Create a Client with a given host and port when connecting to an on-premise instance of the 3scale platform:
-client = new Client({host: "backend.example.com", port: 80});
+client = new Client({host: "service_management_api.example.com", port: 80});
 
 /* or create a Client with default host and port. This will comunicate with the 3scale platform SaaS default server:
 client = new Client();
@@ -84,7 +84,7 @@ client.authrep_with_user_key({ service_token: "your service token", service_id: 
 /* If you don't use service_token in the method, you'll be expected to specify a provider_key parameter in the Client instance, which is deprecated in favor of using service_token in the method.
 
 Create a Client with a given host and port:
-client = new Client("your provider key",{host: "backend.example.com", port: 80});
+client = new Client("your provider key",{host: "service_management_api.example.com", port: 80});
 
 or 
 
@@ -107,7 +107,7 @@ Note that the **report** method supports sending the usage for multiple transact
 var Client = require('3scale').Client;
 
 //Create a Client with a given host and port when connecting to an on-premise instance of the 3scale platform:
-client = new Client({host: "backend.example.com", port: 80});
+client = new Client({host: "service_management_api.example.com", port: 80});
 
 /* or create a Client with default host and port. This will comunicate with the 3scale platform SaaS default server:
 client = new Client();
@@ -128,7 +128,7 @@ client.authorize({ service_token: "your service token", service_id: "your servic
 /* If you don't use service_token in the method, you'll be expected to specify a provider_key parameter in the Client instance, which is deprecated in favor of using service_token in the method.
 
 Create a Client with a given host and port:
-client = new Client("your provider key",{host: "backend.example.com", port: 80});
+client = new Client("your provider key",{host: "service_management_api.example.com", port: 80});
 
 or 
 
@@ -155,7 +155,7 @@ Here is the same example for the `user_key` authentication pattern:
 var Client = require('3scale').Client;
 
 //Create a Client with a given host and port when connecting to an on-premise instance of the 3scale platform:
-client = new Client({host: "backend.example.com", port: 80});
+client = new Client({host: "service_management_api.example.com", port: 80});
 
 /* or create a Client with default host and port. This will comunicate with the 3scale platform SaaS default server:
 client = new Client();
@@ -176,7 +176,7 @@ client.authorize_with_user_key({ service_token: "your service token", service_id
 /* If you don't use service_token in the method, you'll be expected to specify a provider_key parameter in the Client instance, which is deprecated in favor of using service_token in the method.
 
 Create a Client with a given host and port:
-client = new Client("your provider key",{host: "backend.example.com", port: 80});
+client = new Client("your provider key",{host: "service_management_api.example.com", port: 80});
 
 or 
 
@@ -218,7 +218,7 @@ If you set OAuth as the authentication pattern for your API in 3scale, you will 
 var Client = require('3scale').Client;
 
 //Create a Client with a given host and port when connecting to an on-premise instance of the 3scale platform:
-client = new Client({host: "backend.example.com", port: 80});
+client = new Client({host: "service_management_api.example.com", port: 80});
 
 /* or create a Client with default host and port. This will comunicate with the 3scale platform SaaS default server:
 client = new Client();
@@ -239,7 +239,7 @@ client.oauth_authorize({ service_token: "your service token", service_id: "your 
 /* If you don't use service_token in the method, you'll be expected to specify a provider_key parameter in the Client instance, which is deprecated in favor of using service_token in the method.
 
 Create a Client with a given host and port:
-client = new Client("your provider key",{host: "backend.example.com", port: 80});
+client = new Client("your provider key",{host: "service_management_api.example.com", port: 80});
 
 or 
 
