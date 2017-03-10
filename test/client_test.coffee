@@ -54,9 +54,9 @@ describe 'Basic test for the 3Scale::Client', ->
       client = new Client('1234abcd')
       assert.equal typeof client.authrep_with_user_key, 'function'
 
-    it 'should have an authrep_with_oauth method with app_id', ->
+    it 'should have an oauth_authrep method with app_id', ->
       client = new Client('1234abcd')
-      assert.equal typeof client.authrep_with_oauth, 'function'
+      assert.equal typeof client.oauth_authrep, 'function'
 
 
 
@@ -146,10 +146,10 @@ describe 'Basic test for the 3Scale::Client', ->
       nock.cleanAll()
 
 
-  describe 'Request headers in authrep_with_oauth calls', ->
-    it 'should throw an exception if authrep_with_oauth called without :app_id', ->
+  describe 'Request headers in oauth_authrep calls', ->
+    it 'should throw an exception if oauth_authrep called without :app_id', ->
       client = new Client()
-      assert.throws (() -> client.authrep_with_oauth({}, () ->)), 'missing app_id'
+      assert.throws (() -> client.oauth_authrep({}, () ->)), 'missing app_id'
 
     it 'should include the Host and X-3scale-User-Agent headers', (done) ->
       opts =

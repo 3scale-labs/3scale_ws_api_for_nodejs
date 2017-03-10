@@ -251,7 +251,7 @@ module.exports = class Client
       callback {Function} Is the callback function that receives the Response object which includes `is_success` method to determine the status of the response
 
     Example using provider_key:
-      client.authrep_with_oauth {service_id: '1234567890987', app_id: '87654321'}, (response) ->
+      client.oauth_authrep {service_id: '1234567890987', app_id: '87654321'}, (response) ->
         if response.is_success
           # All Ok
         else
@@ -265,7 +265,7 @@ module.exports = class Client
          sys.puts "#{response.error_message} with code: #{response.error_code}"
   ###
 
-  authrep_with_oauth: (options, callback) ->
+  oauth_authrep: (options, callback) ->
     this._verify_app_id_exists options
 
     this._ensure_hits_exist_in options
@@ -273,7 +273,7 @@ module.exports = class Client
     query = this._build_query_string options
     req_opts = this._prepare_request "/transactions/oauth_authrep.xml", query
 
-    this._do_request_response req_opts, callback, "Client::authrep_with_oauth"
+    this._do_request_response req_opts, callback, "Client::oauth_authrep"
 
 
 
