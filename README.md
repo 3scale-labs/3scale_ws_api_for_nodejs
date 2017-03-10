@@ -111,7 +111,7 @@ client = new Client({host: "service_management_api.example.com", port: 80});
 client = new Client();
 */
 
-client.authrep_with_oauth({ service_token: "your service token", service_id: "your service id", app_id: "your application id", usage: { "hits": 1 } }, function(response){
+client.oauth_authrep({ service_token: "your service token", service_id: "your service id", app_id: "your Client id", usage: { "hits": 1 } }, function(response){
   console.log(response);
 });
 
@@ -126,7 +126,7 @@ or
 Create a Client with default host and port.This will comunicate with the 3scale platform SaaS default server:
 client = new Client("your provider key");
 
-client.authrep_with_oauth({ service_id: "your service id", app_id: "your application id" , usage: { "hits": 1 } }, function(response){
+client.oauth_authrep({ service_id: "your service id", app_id: "your Client id" , usage: { "hits": 1 } }, function(response){
   console.log(response);
 });
 
