@@ -146,12 +146,6 @@ describe 'Basic test for the 3Scale::Client', ->
       nock.cleanAll()
 
 
-  describe 'The oauth_authrep method', ->
-    it 'should throw an exception if is called without :app_id', ->
-      client = new Client()
-      assert.throws (() ->  client.authrep_with_oauth({}, () ->)), 'missing app_id'
-
-
   describe 'Request headers in authrep_with_oauth calls', ->
     it 'should throw an exception if authrep_with_oauth called without :app_id', ->
       client = new Client()
