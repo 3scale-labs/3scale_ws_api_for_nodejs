@@ -156,9 +156,9 @@ describe 'Basic test for the 3Scale::Client', ->
         .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
 
       client = new Client '1234abcd'
-      client.oauth_authrep { service_id: '1234567890987', app_id: 'foo'}, (response) ->
-        assert.equal response.is_success(), 200
-        assert.equal response.status_code, false
+      client.oauth_authrep { service_id: '1234567890987', app_id: 'foo',usage: { hits: 1 }}, (response) ->
+        assert.equal response.is_success(), true
+        assert.equal response.status_code, 200
         done()
 
     it 'should call the callback with a error response if app_id was wrong', (done) ->
