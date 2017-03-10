@@ -54,6 +54,9 @@ describe 'Basic test for the 3Scale::Client', ->
       client = new Client('1234abcd')
       assert.equal typeof client.authrep_with_user_key, 'function'
 
+    it 'should have an authrep_with_oauth method with app_id', ->
+      client = new Client('1234abcd')
+      assert.equal typeof client.authrep_with_oauth, 'function'
 
 
 
@@ -143,6 +146,35 @@ describe 'Basic test for the 3Scale::Client', ->
       nock.cleanAll()
 
 
+  describe 'The oauth_authrep method', ->
+    it 'should throw an exception if is called without :app_id', ->
+      client = new Client()
+      assert.throws (() ->  client.authrep_with_oauth({}, () ->)), 'missing app_id'
+
+
+  describe 'Request headers in authrep_with_oauth calls', ->
+    it 'should throw an exception if authrep_with_oauth called without :app_id', ->
+      client = new Client()
+      assert.throws (() -> client.authrep_with_oauth({}, () ->)), 'missing app_id'
+
+    it 'should include the Host and X-3scale-User-Agent headers', (done) ->
+      opts =
+        reqheaders:
+          'Host': 'su1.3scale.net'
+          'X-3scale-User-Agent': 'plugin-node-v' + require('../package.json').version
+
+      match = nock('https://su1.3scale.net', opts)
+        .get('/transactions/oauth_authorize.xml?service_id=1234567890987&app_id=foo&provider_key=1234abcd')
+        .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
+
+      client = new Client '1234abcd'
+      client.oauth_authorize { service_id: '1234567890987', app_id: 'foo' }, (response) ->
+        assert match.isDone()
+        done()
+    after ->
+      nock.cleanAll()
+
+
   describe 'Request headers in authrep calls', ->
     it 'should throw an exception if authrep called without :app_id', ->
       client = new Client()
@@ -165,8 +197,6 @@ describe 'Basic test for the 3Scale::Client', ->
 
     after ->
       nock.cleanAll()
-
-
 
 
   describe 'Request headers in authrep_with_user_key calls', ->
