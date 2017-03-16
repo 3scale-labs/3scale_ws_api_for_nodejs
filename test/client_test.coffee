@@ -152,7 +152,13 @@ describe 'Basic test for the 3Scale::Client', ->
 
     it 'should call the callback with a 200 response if app_id was ok', (done) ->
       nock('https://su1.3scale.net')
-        .get('/transactions/oauth_authrep.xml?service_id=1234567890987&app_id=foo&usage%5Bhits%5D=1&provider_key=1234abcd')
+        .get('/transactions/oauth_authrep.xml')
+        .query({
+          service_id: 1234567890987,
+          app_id: "foo",
+          "usage[hits]":1,
+          provider_key: "1234abcd"
+        }) 
         .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
 
       client = new Client '1234abcd'
@@ -163,7 +169,13 @@ describe 'Basic test for the 3Scale::Client', ->
 
     it 'should call the callback with a error response if app_id was wrong', (done) ->
       nock('https://su1.3scale.net')
-        .get('/transactions/oauth_authrep.xml?service_id=1234567890987&app_id=ERROR&usage%5Bhits%5D=1&provider_key=1234abcd')
+        .get('/transactions/oauth_authrep.xml')
+        .query({
+          service_id: 1234567890987,
+          app_id: "ERROR",
+          "usage[hits]":1,
+          provider_key: "1234abcd"
+        }) 
         .reply(403, '<error code="application_not_found">application with id="ERROR" was not found</error>')
 
       client = new Client '1234abcd'
