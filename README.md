@@ -98,11 +98,48 @@ client.authrep_with_user_key({ "service_id": "your service id", "user_key": "you
 */
 ```
 
+
+If you use `OAuth` as authentication mode, this would be the equivalent to the examples above:
+
+```javascript
+var Client = require('3scale').Client;
+
+//Create a Client with a given host and port when connecting to an on-premise instance of the 3scale platform:
+client = new Client({host: "service_management_api.example.com", port: 80});
+
+/* or create a Client with default host and port. This will comunicate with the 3scale platform SaaS default server:
+client = new Client();
+*/
+
+client.oauth_authrep({ service_token: "your service token", service_id: "your service id", app_id: "your Client id", usage: { "hits": 1 } }, function(response){
+  console.log(response);
+});
+
+
+/* If you don't use service_token in the method, you'll be expected to specify a provider_key parameter in the Client instance, which is deprecated in favor of using service_token in the method.
+
+Create a Client with a given host and port:
+client = new Client("your provider key",{host: "service_management_api.example.com", port: 80});
+
+or 
+
+Create a Client with default host and port.This will comunicate with the 3scale platform SaaS default server:
+client = new Client("your provider key");
+
+client.oauth_authrep({ service_id: "your service id", app_id: "your Client id" , usage: { "hits": 1 } }, function(response){
+  console.log(response);
+});
+
+*/
+```
+
 ### Authorize and Report
 
 You can alternatively use the **authorize** and **report** methods to do the same in two separate calls. 
 Note that the **report** method supports sending the usage for multiple transactions in a single call.
 
+
+If you use the authentication mode with `app_id` and `app_key pair:
 ```javascript
 var Client = require('3scale').Client;
 
@@ -197,22 +234,7 @@ client.authorize_with_user_key({ service_id: "your service id", user_key: "your 
 */
 ```
 
-Note that the **report** method supports sending the usage for multiple transactions in a single call.
-
-```javascript
-var trans = [
-              { service_token: "your service token", app_id: "your application id", usage: {"hits": 1} },
-              { service_token: "your service token", app_id: "your application id", usage: {"hits": 1000} }
-             ]
-
-client.report("your service id", trans, function(response){
-  console.log(response);
-});
-```
-
-### OAuth
-
-If you set OAuth as the authentication pattern for your API in 3scale, you will need to take the separate **authorize** and **report** approach (i.e. there is no **authrep** for OAuth).
+For `OAuth` as the authentication mode:
 
 ```javascript
 var Client = require('3scale').Client;
@@ -224,7 +246,7 @@ client = new Client({host: "service_management_api.example.com", port: 80});
 client = new Client();
 */
 
-client.oauth_authorize({ service_token: "your service token", service_id: "your service id", app_id: "your application id" }, function(response){
+client.oauth_authorize({ service_token: "your service token", service_id: "your service id", app_id: "your Client Id" }, function(response){
   if (response.is_success()) {
     var trans = [{ service_token: "your service token", app_id: "your application id", usage: {"hits": 3} }];
     client.report("your service id", trans, function (response) {
@@ -258,6 +280,19 @@ client.oauth_authorize({ "service_id": "your service id", "app_id": "your applic
   }
 });
 */
+```
+
+Note that the **report** method supports sending the usage for multiple transactions in a single call.
+
+```javascript
+var trans = [
+              { service_token: "your service token", app_id: "your application id", usage: {"hits": 1} },
+              { service_token: "your service token", app_id: "your application id", usage: {"hits": 1000} }
+             ]
+
+client.report("your service id", trans, function(response){
+  console.log(response);
+});
 ```
 
 ## To test

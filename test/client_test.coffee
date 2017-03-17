@@ -54,6 +54,9 @@ describe 'Basic test for the 3Scale::Client', ->
       client = new Client('1234abcd')
       assert.equal typeof client.authrep_with_user_key, 'function'
 
+    it 'should have an oauth_authrep method with app_id', ->
+      client = new Client('1234abcd')
+      assert.equal typeof client.oauth_authrep, 'function'
 
 
 
@@ -127,7 +130,6 @@ describe 'Basic test for the 3Scale::Client', ->
       client = new Client()
       assert.throws (() ->  client.oauth_authorize({}, () ->)), 'missing app_id'
 
-
     it 'should call the callback with a error response if app_id was wrong', (done) ->
       nock('https://su1.3scale.net')
         .get('/transactions/oauth_authorize.xml')
@@ -139,6 +141,49 @@ describe 'Basic test for the 3Scale::Client', ->
         assert.equal response.is_success(), false
         assert.equal response.status_code, 403
         done()
+    after ->
+      nock.cleanAll()
+
+
+  describe 'The oauth_authrep method', ->
+    it 'should throw an exception if oauth_authrep called without :app_id', ->
+      client = new Client()
+      assert.throws (() -> client.oauth_authrep({}, () ->)), 'missing app_id'
+
+    it 'should call the callback with a 200 response if app_id was ok', (done) ->
+      nock('https://su1.3scale.net')
+        .get('/transactions/oauth_authrep.xml')
+        .query({
+          service_id: 1234567890987,
+          app_id: "foo",
+          "usage[hits]":1,
+          provider_key: "1234abcd"
+        }) 
+        .reply(200, '<status><authorized>true</authorized><plan>Basic</plan></status>')
+
+      client = new Client '1234abcd'
+      client.oauth_authrep { service_id: '1234567890987', app_id: 'foo',usage: { hits: 1 }}, (response) ->
+        assert.equal response.is_success(), true
+        assert.equal response.status_code, 200
+        done()
+
+    it 'should call the callback with a error response if app_id was wrong', (done) ->
+      nock('https://su1.3scale.net')
+        .get('/transactions/oauth_authrep.xml')
+        .query({
+          service_id: 1234567890987,
+          app_id: "ERROR",
+          "usage[hits]":1,
+          provider_key: "1234abcd"
+        }) 
+        .reply(403, '<error code="application_not_found">application with id="ERROR" was not found</error>')
+
+      client = new Client '1234abcd'
+      client.oauth_authrep {service_id: '1234567890987', app_id: 'ERROR'}, (response) ->
+        assert.equal response.is_success(), false
+        assert.equal response.status_code, 403
+        done()
+
     after ->
       nock.cleanAll()
 
@@ -162,11 +207,8 @@ describe 'Basic test for the 3Scale::Client', ->
       client.authorize { service_id: '1234567890987', app_id: 'foo' }, (response) ->
         assert match.isDone()
         done()
-
     after ->
       nock.cleanAll()
-
-
 
 
   describe 'Request headers in authrep_with_user_key calls', ->
